@@ -829,184 +829,253 @@
         :root { color-scheme: dark; }
         html.light-mode {
             color-scheme: light;
-            --light-bg: #eef4fa;
-            --light-surface: #ffffff;
-            --light-surface-soft: #f8fbff;
-            --light-border: #cbd5e1;
-            --light-border-strong: #b8c6d6;
-            --light-text: #172033;
-            --light-muted: #526176;
-            --light-blue: #0369a1;
-            --light-indigo: #4f46e5;
-            --light-shadow: 0 12px 32px rgba(15,23,42,.10);
+            --l-bg: #f3f6fa;
+            --l-surface: #ffffff;
+            --l-soft: #f1f5f9;
+            --l-border: #d5dde8;
+            --l-border-strong: #b6c3d3;
+            --l-ink: #0f172a;      /* headings */
+            --l-body: #334155;     /* body copy, 10:1 on white */
+            --l-muted: #475569;    /* secondary, 7.5:1 */
+            --l-faint: #5b6b80;    /* tertiary, 5.4:1 */
+            --l-sky: #0369a1;
+            --l-emerald: #047857;
+            --l-amber: #b45309;
+            --l-rose: #be123c;
+            --l-indigo: #4338ca;
+            --l-purple: #7e22ce;
+            --l-shadow: 0 1px 2px rgba(15,23,42,.06), 0 8px 24px rgba(15,23,42,.07);
         }
 
-        /* Solid, clean light canvas */
-        html.light-mode body {
-            background: #eef4fa !important;
-            color: var(--light-text) !important;
-        }
-        html.light-mode #bgImg {
-            filter: brightness(.72) contrast(1.04) saturate(.72) !important;
-        }
-        html.light-mode #bgGradientOverlay {
-            background:
-                linear-gradient(to bottom,
-                    rgba(244,249,255,.93) 0%,
-                    rgba(238,246,253,.91) 48%,
-                    rgba(246,249,252,.96) 100%) !important;
-        }
-        html.light-mode #bgContainer::after {
-            content:"";
-            position:absolute;
-            inset:0;
-            background:rgba(255,255,255,.16);
-            pointer-events:none;
-        }
-        html.light-mode .procurement-grid {
-            opacity:.14;
-            background-image:
-                linear-gradient(rgba(2,105,161,.16) 1px,transparent 1px),
-                linear-gradient(90deg,rgba(2,105,161,.16) 1px,transparent 1px);
-        }
-        html.light-mode .procurement-scan {
-            opacity:.48;
-            filter:saturate(.8);
-        }
-        html.light-mode .verification-orbit {
-            border-color:rgba(2,105,161,.20);
-            box-shadow:0 0 80px rgba(2,105,161,.08), inset 0 0 80px rgba(79,70,229,.04);
-        }
-        html.light-mode .verification-orbit::before { border-color:rgba(79,70,229,.16); }
-        html.light-mode .verification-orbit::after { border-color:rgba(217,119,6,.15); }
+        /* ---- Canvas: flat and calm; heavy decorative layers are switched off ---- */
+        html.light-mode body { background: var(--l-bg) !important; color: var(--l-body) !important; }
+        /* Background image + interactive layers stay ON in light mode (see "Light background" block below) */
+        /* Solid surfaces make backdrop blur pointless, so drop it (cheaper to paint) */
+        html.light-mode .glass-card,
+        html.light-mode header,
+        html.light-mode #appSidebar,
+        html.light-mode .verification-badge { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+        html.light-mode .animated-border::after { animation: none !important; }
         html.light-mode .verification-badge {
-            background:#ffffff !important;
-            border-color:#b8c6d6 !important;
-            color:#243247 !important;
-            box-shadow:0 8px 24px rgba(15,23,42,.11);
-            backdrop-filter:blur(8px);
+            background: #fff !important; border-color: var(--l-border-strong) !important;
+            color: var(--l-body) !important; box-shadow: var(--l-shadow);
         }
-        html.light-mode .verification-badge span { box-shadow:0 0 7px rgba(5,150,105,.45); }
 
-        /* Make every major surface solid and readable */
+        /* ---- Surfaces ---- */
         html.light-mode .glass-card {
-            background:#ffffff !important;
-            border-color:#cbd5e1 !important;
-            box-shadow:var(--light-shadow) !important;
-            backdrop-filter:blur(8px);
+            background: var(--l-surface) !important;
+            border-color: var(--l-border) !important;
+            box-shadow: var(--l-shadow) !important;
         }
+        html.light-mode .glass-card:hover { box-shadow: 0 2px 4px rgba(15,23,42,.06), 0 14px 32px rgba(15,23,42,.11) !important; }
         html.light-mode header {
-            background:#ffffff !important;
-            border-color:#cbd5e1 !important;
-            box-shadow:0 4px 18px rgba(15,23,42,.08);
-            backdrop-filter:blur(14px);
+            background: rgba(255,255,255,.96) !important;
+            border-color: var(--l-border) !important;
+            box-shadow: 0 1px 0 var(--l-border), 0 4px 16px rgba(15,23,42,.05);
         }
         html.light-mode #appSidebar {
-            background:#ffffff !important;
-            border-color:#cbd5e1 !important;
-            box-shadow:12px 0 35px rgba(15,23,42,.12);
-            backdrop-filter:none;
+            background: #fff !important; border-color: var(--l-border) !important;
+            box-shadow: 12px 0 32px rgba(15,23,42,.10);
         }
-        html.light-mode #sidebarBackdrop { background:rgba(15,23,42,.28) !important; }
+        html.light-mode #sidebarBackdrop { background: rgba(15,23,42,.30) !important; }
+        html.light-mode .bg-slate-950, html.light-mode .bg-slate-950\/70, html.light-mode .bg-slate-950\/80,
+        html.light-mode .bg-slate-950\/90, html.light-mode .bg-slate-950\/95, html.light-mode .bg-slate-900,
+        html.light-mode .bg-slate-900\/30, html.light-mode .bg-slate-900\/40, html.light-mode .bg-slate-900\/60,
+        html.light-mode .bg-slate-900\/80, html.light-mode .bg-slate-900\/90 { background-color: #fff !important; }
+        html.light-mode .bg-slate-800, html.light-mode .bg-slate-800\/60, html.light-mode .bg-slate-800\/80 {
+            background-color: var(--l-soft) !important;
+        }
+        /* Dark gradient panels become soft tinted panels */
+        html.light-mode .from-slate-900, html.light-mode .to-slate-900, html.light-mode .via-slate-950,
+        html.light-mode .from-sky-900\/30, html.light-mode .via-indigo-900\/30, html.light-mode .to-purple-900\/30 {
+            background-image: linear-gradient(135deg, #f0f9ff 0%, #eef2ff 55%, #faf5ff 100%) !important;
+        }
+        html.light-mode [class*="border-slate-"], html.light-mode [class*="divide-slate-"] > * { border-color: var(--l-border) !important; }
+        html.light-mode .shadow-black\/50 { --tw-shadow-color: rgba(15,23,42,.14) !important; }
 
-        /* Consistent typography */
-        html.light-mode .text-white { color:#172033 !important; }
-        html.light-mode .text-slate-100 { color:#1e293b !important; }
-        html.light-mode .text-slate-200 { color:#334155 !important; }
-        html.light-mode .text-slate-300 { color:#475569 !important; }
-        html.light-mode .text-slate-400 { color:#526176 !important; }
-        html.light-mode .text-slate-500 { color:#64748b !important; }
-        html.light-mode .text-slate-600 { color:#475569 !important; }
+        /* ---- Text: neutral scale ---- */
+        html.light-mode .text-white { color: var(--l-ink) !important; }
+        html.light-mode .text-slate-100 { color: var(--l-ink) !important; }
+        html.light-mode .text-slate-200 { color: #1e293b !important; }
+        html.light-mode .text-slate-300 { color: var(--l-body) !important; }
+        html.light-mode .text-slate-400 { color: var(--l-muted) !important; }
+        html.light-mode .text-slate-500 { color: var(--l-faint) !important; }
+        html.light-mode .text-slate-600 { color: var(--l-muted) !important; }
+        html.light-mode ::placeholder { color: #7a8aa0 !important; opacity: 1; }
+        /* White stays white on solid coloured buttons / gradient CTAs */
+        html.light-mode .bg-gradient-to-r.text-white, html.light-mode .bg-gradient-to-r .text-white,
+        html.light-mode .bg-sky-500.text-white, html.light-mode .bg-sky-500 .text-white { color: #fff !important; }
 
-        /* Replace dark Tailwind surfaces with actual light surfaces */
-        html.light-mode .bg-slate-950,
-        html.light-mode .bg-slate-950\/80,
-        html.light-mode .bg-slate-950\/90,
-        html.light-mode .bg-slate-900,
-        html.light-mode .bg-slate-900\/60,
-        html.light-mode .bg-slate-900\/90 {
-            background-color:#ffffff !important;
-        }
-        html.light-mode .bg-slate-800,
-        html.light-mode .bg-slate-800\/80,
-        html.light-mode .bg-slate-800\/60 {
-            background-color:#f1f5f9 !important;
-        }
-        html.light-mode .border-slate-800,
-        html.light-mode .border-slate-800\/80,
-        html.light-mode .border-slate-700,
-        html.light-mode .border-slate-600 {
-            border-color:#cbd5e1 !important;
+        /* ---- Text: accent colours darkened for contrast on white ---- */
+        html.light-mode .text-sky-200, html.light-mode .text-sky-300, html.light-mode .text-sky-300\/90,
+        html.light-mode .text-sky-400 { color: var(--l-sky) !important; }
+        html.light-mode .text-emerald-300, html.light-mode .text-emerald-400 { color: var(--l-emerald) !important; }
+        html.light-mode .text-amber-300, html.light-mode .text-amber-400, html.light-mode .text-amber-400\/90 { color: var(--l-amber) !important; }
+        html.light-mode .text-rose-300, html.light-mode .text-rose-400 { color: var(--l-rose) !important; }
+        html.light-mode .text-indigo-300, html.light-mode .text-indigo-400 { color: var(--l-indigo) !important; }
+        html.light-mode .text-purple-400 { color: var(--l-purple) !important; }
+        html.light-mode .hover\:text-sky-300:hover, html.light-mode .group:hover .group-hover\:text-sky-300 { color: #075985 !important; }
+        html.light-mode .gradient-text {
+            background-image: linear-gradient(135deg, #0369a1 0%, #4338ca 50%, #b45309 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: none;
         }
 
-        /* Navigation and controls */
-        html.light-mode .sidebar-link:hover {
-            background:#e8f3fb !important;
-            color:#0369a1 !important;
+        /* ---- Tinted badges / alerts: solid pastel + visible border ---- */
+        html.light-mode .bg-emerald-500\/5, html.light-mode .bg-emerald-500\/10 { background-color: #ecfdf5 !important; }
+        html.light-mode .bg-amber-500\/5,   html.light-mode .bg-amber-500\/10   { background-color: #fffbeb !important; }
+        html.light-mode .bg-rose-500\/5,    html.light-mode .bg-rose-500\/10    { background-color: #fff1f2 !important; }
+        html.light-mode .bg-sky-500\/10                                          { background-color: #f0f9ff !important; }
+        html.light-mode .bg-indigo-500\/10                                       { background-color: #eef2ff !important; }
+        html.light-mode .bg-purple-500\/10                                       { background-color: #faf5ff !important; }
+        html.light-mode .bg-amber-500\/20 { background-color: #fef3c7 !important; }
+        html.light-mode [class*="border-emerald-500/"] { border-color: #6ee7b7 !important; }
+        html.light-mode [class*="border-amber-500/"]   { border-color: #fcd34d !important; }
+        html.light-mode [class*="border-rose-500/"]    { border-color: #fda4af !important; }
+        html.light-mode [class*="border-sky-500/"]     { border-color: #7dd3fc !important; }
+        html.light-mode [class*="border-indigo-500/"]  { border-color: #a5b4fc !important; }
+        html.light-mode [class*="border-purple-500/"]  { border-color: #d8b4fe !important; }
+
+        /* ---- Hover states that were tuned for dark ---- */
+        html.light-mode .hover\:bg-slate-800\/30:hover, html.light-mode .hover\:bg-slate-800:hover,
+        html.light-mode .hover\:bg-slate-900:hover, html.light-mode .hover\:bg-slate-900\/70:hover,
+        html.light-mode .hover\:bg-slate-700:hover { background-color: #eaf1f8 !important; }
+        html.light-mode .hover\:bg-emerald-500\/5:hover, html.light-mode .hover\:bg-emerald-500\/10:hover, html.light-mode .hover\:bg-emerald-500\/20:hover { background-color: #d1fae5 !important; }
+        html.light-mode .hover\:bg-amber-500\/20:hover { background-color: #fde68a !important; }
+        html.light-mode .hover\:bg-rose-500\/5:hover, html.light-mode .hover\:bg-rose-500\/20:hover { background-color: #ffe4e6 !important; }
+
+        /* ---- Tables ---- */
+        html.light-mode table thead { background: var(--l-soft) !important; }
+        html.light-mode table th { color: #1e293b !important; }
+        html.light-mode table td, html.light-mode table th { border-color: var(--l-border) !important; }
+
+        /* ---- Forms ---- */
+        html.light-mode textarea, html.light-mode input:not([type="file"]) {
+            background: #fff !important; color: var(--l-ink) !important; border-color: var(--l-border-strong) !important;
         }
+        html.light-mode textarea:focus, html.light-mode input:not([type="file"]):focus {
+            outline: none; border-color: var(--l-sky) !important; box-shadow: 0 0 0 3px rgba(3,105,161,.16);
+        }
+
+        /* ---- Navigation and controls ---- */
+        html.light-mode .sidebar-link:hover { background: #eaf3fb !important; color: #075985 !important; }
         html.light-mode .sidebar-link.active {
-            background:#e0f2fe !important;
-            color:#075985 !important;
-            border-color:#bae6fd !important;
+            background: #e0f2fe !important; color: #075985 !important; border-color: #7dd3fc !important;
         }
-        html.light-mode .theme-toggle,
-        html.light-mode #bgSwitcherBtn {
-            background:#f8fafc !important;
-            color:#075985 !important;
-            border-color:#93c5fd !important;
-            box-shadow:0 4px 12px rgba(15,23,42,.08);
+        html.light-mode .sidebar-link.active::before { background: var(--l-sky); box-shadow: none; }
+        html.light-mode .theme-toggle, html.light-mode #bgSwitcherBtn {
+            background: #fff !important; color: #075985 !important;
+            border-color: #7dd3fc !important; box-shadow: 0 1px 3px rgba(15,23,42,.08);
         }
-        html.light-mode .theme-toggle:hover,
-        html.light-mode #bgSwitcherBtn:hover {
-            background:#e0f2fe !important;
-        }
+        html.light-mode .theme-toggle:hover, html.light-mode #bgSwitcherBtn:hover { background: #e0f2fe !important; }
 
-        /* Hero badges / chips / status panels */
+        /* ---- Document trail (hero stages) ---- */
         html.light-mode .document-paper {
-            background:linear-gradient(145deg,#ffffff,#f8fafc) !important;
-            border-color:#cbd5e1 !important;
-            box-shadow:0 12px 30px rgba(15,23,42,.12),0 0 0 4px rgba(226,232,240,.75) !important;
+            background: #fff !important; border-color: var(--l-border-strong) !important;
+            box-shadow: 0 1px 2px rgba(15,23,42,.06), 0 10px 24px rgba(15,23,42,.09) !important;
         }
-        html.light-mode .document-label { color:#334155 !important; }
-        html.light-mode .document-detail { color:#0369a1 !important; }
-        html.light-mode .document-trail::before { border-color:#cbd5e1; }
-        html.light-mode .document-status { box-shadow:0 4px 12px rgba(15,23,42,.10); }
-
-        html.light-mode .pipeline-step,
-        html.light-mode .tech-chip {
-            background:#ffffff !important;
-            border-color:#cbd5e1 !important;
-            box-shadow:0 8px 22px rgba(15,23,42,.07);
+        html.light-mode .document-node.scanning .document-paper { box-shadow: 0 0 0 2px rgba(3,105,161,.5), 0 12px 26px rgba(3,105,161,.16) !important; }
+        html.light-mode .document-node.verified .document-paper { box-shadow: 0 0 0 2px rgba(4,120,87,.4), 0 12px 26px rgba(4,120,87,.14) !important; }
+        html.light-mode .document-label { color: #1e293b !important; }
+        html.light-mode .document-detail { color: var(--l-sky) !important; font-weight: 800; }
+        html.light-mode .document-trail::before { border-color: var(--l-border-strong); }
+        html.light-mode .document-status {
+            background: #ecfdf5; border-color: #059669; color: var(--l-emerald); box-shadow: 0 2px 8px rgba(4,120,87,.18);
         }
-        html.light-mode .pipeline-title { color:#172033 !important; }
-        html.light-mode .pipeline-desc,
-        html.light-mode .tech-chip { color:#475569 !important; }
-        html.light-mode .pipeline-arrow { color:#64748b !important; }
-
-        html.light-mode .impact-bar-track {
-            background:#dbe4ee !important;
-            border:1px solid #cbd5e1;
+        html.light-mode .document-status.pending {
+            background: var(--l-soft); border-color: #94a3b8; color: var(--l-muted); box-shadow: none;
         }
-        html.light-mode .explain-toggle-btn {
-            background:#f8fafc !important;
-            color:#475569 !important;
-            border-color:#cbd5e1 !important;
+        html.light-mode .document-node.scanning .document-status {
+            background: #e0f2fe; border-color: #0284c7; color: #075985; box-shadow: 0 2px 10px rgba(2,132,199,.28);
         }
-        html.light-mode .explain-toggle-btn:hover {
-            background:#e0f2fe !important;
-            color:#0369a1 !important;
-        }
-        html.light-mode .explain-row td {
-            background:#f0f9ff !important;
-            border-left-color:#38bdf8 !important;
+        html.light-mode .document-node.verified .document-status {
+            background: #ecfdf5; border-color: #059669; color: var(--l-emerald); box-shadow: 0 2px 8px rgba(4,120,87,.22);
         }
 
-        /* Keep the GeM identity accents crisp in light mode */
-        html.light-mode .gem-logo {
-            box-shadow:0 0 0 2px rgba(2,132,199,.14),0 7px 20px rgba(15,23,42,.14);
+        /* ---- Pipeline, chips, bars ---- */
+        html.light-mode .pipeline-step, html.light-mode .tech-chip {
+            background: #fff !important; border-color: var(--l-border) !important; box-shadow: var(--l-shadow);
         }
-        html.light-mode .chakra-wheel { color:#2563eb; }
-        html.light-mode .chakra-wheel svg { filter:drop-shadow(0 1px 4px rgba(37,99,235,.22)); }
+        html.light-mode .pipeline-title { color: var(--l-ink) !important; }
+        html.light-mode .pipeline-desc, html.light-mode .tech-chip { color: var(--l-muted) !important; }
+        html.light-mode .pipeline-arrow { color: #64748b !important; }
+        html.light-mode .impact-bar-track { background: #e2e8f0 !important; border: 1px solid var(--l-border); }
+        html.light-mode .explain-toggle-btn { background: #fff !important; color: var(--l-muted) !important; border-color: var(--l-border-strong) !important; }
+        html.light-mode .explain-toggle-btn:hover { background: #e0f2fe !important; color: #075985 !important; border-color: #38bdf8 !important; }
+        html.light-mode .explain-row td { background: #f0f9ff !important; border-left-color: #0284c7 !important; }
+
+        /* ---- GeM identity accents ---- */
+        html.light-mode .gem-logo { box-shadow: 0 0 0 2px rgba(3,105,161,.16), 0 6px 16px rgba(15,23,42,.14); }
+        html.light-mode .chakra-wheel { color: #1d4ed8; }
+        html.light-mode .chakra-wheel svg { filter: none; }
+
+        /* ===== Light background: image + dynamic animation (mirrors dark mode) ===== */
+        html.light-mode #bgImg {
+            filter: brightness(1.35) contrast(.95) saturate(.8) !important;
+            opacity: .55;
+        }
+        html.light-mode #bgGradientOverlay {
+            background: linear-gradient(180deg, rgba(248,250,252,.80) 0%, rgba(243,246,250,.68) 50%, rgba(238,243,249,.86) 100%) !important;
+        }
+        html.light-mode #interactiveBgCanvas { opacity: .9; }
+        html.light-mode #bgContainer > .opacity-20 { opacity: .5 !important; }
+        html.light-mode .radar-sweep-bg {
+            background: conic-gradient(from 0deg at 50% 50%, rgba(3,105,161,.20) 0deg, rgba(3,105,161,0) 60deg, transparent 360deg);
+        }
+        html.light-mode .procurement-grid {
+            opacity: .6;
+            animation: gridDrift 18s linear infinite !important;
+            background-image:
+                linear-gradient(rgba(3,105,161,.16) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(3,105,161,.16) 1px, transparent 1px);
+        }
+        html.light-mode .procurement-scan {
+            background: linear-gradient(90deg, transparent, rgba(3,105,161,.2), #0284c7, rgba(217,119,6,.75), transparent);
+            box-shadow: 0 0 18px rgba(2,132,199,.45), 0 0 40px rgba(217,119,6,.18);
+        }
+        html.light-mode .procurement-scan::before { border-color: rgba(3,105,161,.7); box-shadow: 0 0 12px rgba(3,105,161,.35); }
+        html.light-mode .procurement-scan::after  { border-color: rgba(217,119,6,.75); box-shadow: 0 0 12px rgba(217,119,6,.3); }
+        html.light-mode .verification-orbit {
+            border-color: rgba(3,105,161,.24);
+            box-shadow: 0 0 60px rgba(3,105,161,.08), inset 0 0 60px rgba(67,56,202,.06);
+        }
+        html.light-mode .verification-orbit::before { border-color: rgba(67,56,202,.26); }
+        html.light-mode .verification-orbit::after  { border-color: rgba(217,119,6,.28); }
+        html.light-mode .verification-orbit .orbit-dot { background: #0284c7; box-shadow: 0 0 10px rgba(2,132,199,.8), 0 0 24px rgba(2,132,199,.4); }
+        html.light-mode .verification-badge {
+            background: rgba(255,255,255,.82) !important;
+            border-color: rgba(3,105,161,.35) !important;
+            color: #0c4a6e !important;
+            backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;
+            box-shadow: 0 8px 24px rgba(15,23,42,.10) !important;
+        }
+        html.light-mode .verification-badge span { background: #059669; box-shadow: 0 0 8px rgba(5,150,105,.7); }
+        html.light-mode .document-stream i {
+            border-color: rgba(3,105,161,.35);
+            background: linear-gradient(135deg, rgba(3,105,161,.14), rgba(67,56,202,.08));
+        }
+        html.light-mode .document-stream i::after {
+            background: rgba(3,105,161,.5);
+            box-shadow: 0 5px rgba(3,105,161,.28), 0 10px rgba(217,119,6,.28);
+        }
+        /* Let the background show through section bands and cards (frosted white) */
+        html.light-mode section#problem,
+        html.light-mode section#stages,
+        html.light-mode section#architecture { background: rgba(255,255,255,.58) !important; backdrop-filter: blur(6px) !important; -webkit-backdrop-filter: blur(6px) !important; }
+        html.light-mode section#demo { background: rgba(255,255,255,.66) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important; }
+        html.light-mode footer { background: rgba(255,255,255,.80) !important; }
+        html.light-mode header { background: rgba(255,255,255,.86) !important; backdrop-filter: blur(14px) !important; -webkit-backdrop-filter: blur(14px) !important; }
+        html.light-mode .glass-card { background: rgba(255,255,255,.88) !important; backdrop-filter: blur(10px) !important; -webkit-backdrop-filter: blur(10px) !important; }
+
+        /* ===== Our Outcome: main lines colour (light theme) ===== */
+        html.light-mode #outcomeCard .outcome-label { color: #b45309 !important; }
+        html.light-mode #outcomeCard .outcome-main { color: #0b2a6b !important; }
+        html.light-mode #outcomeCard .outcome-main .gradient-text {
+            background-image: linear-gradient(135deg, #0369a1 0%, #6d28d9 50%, #c2410c 100%);
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+        }
 
         /* Theme button */
         .theme-toggle { position:relative; min-width:92px; }
@@ -1334,9 +1403,9 @@
                 </div>
             </div>
 
-            <div class="animated-border rounded-3xl bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900 border border-slate-800 p-8 sm:p-10 text-center">
-                <p class="text-xs uppercase tracking-[0.2em] text-sky-400 font-bold mb-3">Our Outcome</p>
-                <p class="text-2xl sm:text-3xl font-extrabold text-white leading-snug max-w-3xl mx-auto">BidSeva cuts document verification from <span class="gradient-text">~5 hours to under 3 minutes</span> per bid — while catching fraud patterns no manual reviewer can.</p>
+            <div id="outcomeCard" class="animated-border rounded-3xl bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900 border border-slate-800 p-8 sm:p-10 text-center">
+                <p class="outcome-label text-xs uppercase tracking-[0.2em] text-sky-400 font-bold mb-3">Our Outcome</p>
+                <p class="outcome-main text-2xl sm:text-3xl font-extrabold text-white leading-snug max-w-3xl mx-auto">BidSeva cuts document verification from <span class="gradient-text">~5 hours to under 3 minutes</span> per bid — while catching fraud patterns no manual reviewer can.</p>
                 <div class="mt-9 grid grid-cols-2 sm:grid-cols-4 gap-6" id="problemStatGrid">
                     <div class="stat-reveal"><p class="text-2xl font-extrabold text-sky-400">1,684+</p><p class="text-[11px] text-slate-400 mt-1">New Bids Published Daily on GeM*</p></div>
                     <div class="stat-reveal"><p class="text-2xl font-extrabold text-amber-400">₹1,172 Cr</p><p class="text-[11px] text-slate-400 mt-1">Avg. Daily GMV Transacted on GeM*</p></div>
@@ -2077,6 +2146,20 @@
         let currentLineRgb = '56, 189, 248';
         let currentNodeColor1 = '#38bdf8';
         let currentNodeColor2 = '#f59e0b';
+        // Light-theme palettes (darker, higher contrast on a pale background), one per bg theme
+        const lightPalettes = [
+            { line: '3,105,161',  n1: '#0284c7', n2: '#d97706', mouse: '217,119,6' },
+            { line: '4,120,87',   n1: '#059669', n2: '#0284c7', mouse: '217,119,6' },
+            { line: '67,56,202',  n1: '#4f46e5', n2: '#9333ea', mouse: '190,24,93' }
+        ];
+        let P = { line: currentLineRgb, n1: currentNodeColor1, n2: currentNodeColor2, mouse: '245,158,11' };
+        function refreshPalette() {
+            if (document.documentElement.classList.contains('light-mode')) {
+                P = lightPalettes[currentBgThemeIndex] || lightPalettes[0];
+            } else {
+                P = { line: currentLineRgb, n1: currentNodeColor1, n2: currentNodeColor2, mouse: '245,158,11' };
+            }
+        }
 
         function resizeCanvas() {
             width = canvas.width = window.innerWidth;
@@ -2115,9 +2198,9 @@
             draw() {
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = this.radius > 2 ? currentNodeColor1 : currentNodeColor2;
+                ctx.fillStyle = this.radius > 2 ? P.n1 : P.n2;
                 ctx.shadowBlur = 8;
-                ctx.shadowColor = currentNodeColor1;
+                ctx.shadowColor = P.n1;
                 ctx.fill();
                 ctx.shadowBlur = 0;
             }
@@ -2132,6 +2215,11 @@
         }
 
         function animateCanvas() {
+            if (document.hidden) {
+                requestAnimationFrame(animateCanvas);
+                return;
+            }
+            refreshPalette();
             ctx.clearRect(0, 0, width, height);
 
             for (let i = 0; i < particles.length; i++) {
@@ -2147,7 +2235,7 @@
                         ctx.beginPath();
                         ctx.moveTo(particles[i].x, particles[i].y);
                         ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.strokeStyle = `rgba(${currentLineRgb}, ${0.3 * (1 - dist / 130)})`;
+                        ctx.strokeStyle = `rgba(${P.line}, ${(document.documentElement.classList.contains('light-mode') ? 0.4 : 0.3) * (1 - dist / 130)})`;
                         ctx.lineWidth = 0.7;
                         ctx.stroke();
                     }
@@ -2161,7 +2249,7 @@
                         ctx.beginPath();
                         ctx.moveTo(particles[i].x, particles[i].y);
                         ctx.lineTo(mouse.x, mouse.y);
-                        ctx.strokeStyle = `rgba(245, 158, 11, ${0.5 * (1 - dist / mouse.radius)})`;
+                        ctx.strokeStyle = `rgba(${P.mouse}, ${0.5 * (1 - dist / mouse.radius)})`;
                         ctx.lineWidth = 0.9;
                         ctx.stroke();
                     }
@@ -2180,7 +2268,7 @@
             if (bgImg) bgImg.style.transform = `scale(1.06) translate(${moveX * -0.6}px, ${moveY * -0.6}px)`;
             const orbit = document.querySelector('.verification-orbit');
             if (orbit) orbit.style.transform = `translate(calc(-50% + ${moveX * 0.18}px), calc(-50% + ${moveY * 0.18}px))`;
-            if (cursorGlow) cursorGlow.style.background = `radial-gradient(650px circle at ${e.clientX}px ${e.clientY}px, rgba(${currentLineRgb}, 0.18), rgba(245, 158, 11, 0.05) 50%, transparent 80%)`;
+            if (cursorGlow) { refreshPalette(); const lm = document.documentElement.classList.contains('light-mode'); cursorGlow.style.background = `radial-gradient(650px circle at ${e.clientX}px ${e.clientY}px, rgba(${P.line}, ${lm ? 0.16 : 0.18}), rgba(${P.mouse}, ${lm ? 0.06 : 0.05}) 50%, transparent 80%)`; };
         });
 
         window.addEventListener('mouseleave', () => {
