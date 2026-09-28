@@ -1085,6 +1085,107 @@
             .theme-toggle{min-width:auto;padding:10px!important}
             .theme-toggle-label{display:none;}
         }
+
+        /* ===== Light mode: stronger global text contrast ===== */
+        html.light-mode .text-slate-50,
+        html.light-mode .text-slate-100,
+        html.light-mode .text-slate-200 { color: #0f172a !important; }
+        html.light-mode .text-slate-300,
+        html.light-mode .text-slate-400,
+        html.light-mode .text-slate-500,
+        html.light-mode .text-slate-600,
+        html.light-mode .text-slate-700 { color: #334155 !important; }
+        html.light-mode .text-gray-300,
+        html.light-mode .text-gray-400,
+        html.light-mode .text-gray-500,
+        html.light-mode .text-gray-600,
+        html.light-mode .text-gray-700 { color: #334155 !important; }
+        html.light-mode .text-zinc-300,
+        html.light-mode .text-zinc-400,
+        html.light-mode .text-zinc-500,
+        html.light-mode .text-zinc-600 { color: #334155 !important; }
+        html.light-mode .text-neutral-300,
+        html.light-mode .text-neutral-400,
+        html.light-mode .text-neutral-500,
+        html.light-mode .text-neutral-600 { color: #334155 !important; }
+
+        /* Custom dark-on-light components */
+        html.light-mode .integration-map .integration-title,
+        html.light-mode .integration-map .integration-label,
+        html.light-mode .integration-map .integration-node-title { color: #0f172a !important; }
+        html.light-mode .integration-map .integration-node-desc,
+        html.light-mode .integration-map .integration-meta { color: #475569 !important; }
+        html.light-mode .integration-map .integration-node {
+            background: rgba(255,255,255,.94) !important;
+            border-color: #cbd5e1 !important;
+            box-shadow: 0 8px 22px rgba(15,23,42,.08);
+        }
+        html.light-mode .integration-map .integration-node:hover {
+            border-color: #0284c7 !important;
+            box-shadow: 0 12px 28px rgba(2,132,199,.14);
+        }
+        html.light-mode .integration-map .integration-core {
+            background: #ffffff !important;
+            border-color: #94a3b8 !important;
+            color: #0f172a !important;
+            box-shadow: 0 12px 35px rgba(15,23,42,.12);
+        }
+        html.light-mode .integration-map .integration-tooltip {
+            background: #ffffff !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+            box-shadow: 0 12px 30px rgba(15,23,42,.14);
+        }
+        html.light-mode .integration-map .integration-legend,
+        html.light-mode .integration-map .integration-check {
+            background: rgba(255,255,255,.92) !important;
+            border-color: #d5dde8 !important;
+            color: #334155 !important;
+        }
+
+        /* Common light-mode dark-background utility blocks */
+        html.light-mode .bg-black,
+        html.light-mode .bg-black\/20,
+        html.light-mode .bg-black\/30,
+        html.light-mode .bg-black\/40,
+        html.light-mode .bg-black\/50 { background-color: #ffffff !important; }
+        html.light-mode .text-black { color: #0f172a !important; }
+
+        /* ===== Procurement Integration Map — live network animation ===== */
+        .integration-map { min-height: 650px; isolation: isolate; }
+        .integration-grid-bg { position:absolute; inset:0; opacity:.24; background-image:linear-gradient(rgba(56,189,248,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,.09) 1px,transparent 1px); background-size:34px 34px; mask-image:radial-gradient(circle at center,#000 15%,transparent 82%); animation: integrationGrid 14s linear infinite; }
+        .integration-scanline { position:absolute; left:6%; right:6%; top:0; height:2px; background:linear-gradient(90deg,transparent,#38bdf8,#818cf8,transparent); box-shadow:0 0 18px #38bdf8; opacity:.55; animation: integrationScan 5s ease-in-out infinite; }
+        .integration-orbit { position:absolute; left:50%; top:50%; border:1px solid rgba(56,189,248,.09); border-radius:50%; transform:translate(-50%,-50%); pointer-events:none; }
+        .orbit-one { width:330px;height:330px; animation:orbitPulse 5s ease-in-out infinite; }
+        .orbit-two { width:500px;height:500px; border-style:dashed; animation:orbitRotate 28s linear infinite; }
+        .orbit-three { width:680px;height:680px; border-color:rgba(245,158,11,.07); animation:orbitRotateReverse 40s linear infinite; }
+        .integration-network { position:relative; min-height:590px; display:grid; grid-template-columns:1fr 280px 1fr; align-items:center; gap:30px; z-index:3; }
+        .integration-lines { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; overflow:visible; z-index:0; }
+        .integration-path { fill:none; stroke-width:1.5; stroke-dasharray:8 10; opacity:.48; filter:url(#lineGlow); animation:pathFlow 4s linear infinite; }
+        .path-sky { stroke:url(#lineSky); }.path-green { stroke:url(#lineGreen); }
+        .data-pulse { fill:#67e8f9; filter:drop-shadow(0 0 7px #38bdf8); }
+        .pulse-b,.pulse-d { fill:#6ee7b7; filter:drop-shadow(0 0 7px #34d399); }
+        .integration-column { display:flex; flex-direction:column; justify-content:space-between; height:420px; position:relative; z-index:4; }
+        .integration-column.left { align-items:flex-end; }.integration-column.right { align-items:flex-start; }
+        .integration-node { width:min(285px,100%); min-height:88px; display:flex; align-items:center; gap:12px; padding:13px 14px; border:1px solid rgba(71,85,105,.7); background:rgba(7,16,32,.78); backdrop-filter:blur(12px); border-radius:18px; box-shadow:0 14px 35px rgba(0,0,0,.2); cursor:pointer; transition:transform .3s ease,border-color .3s ease,box-shadow .3s ease,background .3s ease; animation:nodeFloat 4s ease-in-out infinite; }
+        .integration-node:nth-child(2){animation-delay:-1.3s}.integration-node:nth-child(3){animation-delay:-2.6s}
+        .integration-node:hover,.integration-node.selected { transform:translateY(-5px) scale(1.025); background:rgba(15,30,55,.92); border-color:rgba(56,189,248,.65); box-shadow:0 0 0 1px rgba(56,189,248,.15),0 18px 42px rgba(2,132,199,.18); }
+        .integration-column.right .integration-node { flex-direction:row-reverse; text-align:right; }
+        .integration-node .node-icon { width:40px;height:40px;flex:0 0 40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.22);color:#67e8f9; }
+        .node-green .node-icon { color:#6ee7b7;background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.22); }.node-purple .node-icon{color:#c4b5fd;background:rgba(129,140,248,.08);border-color:rgba(129,140,248,.22)}
+        .integration-node b{display:block;color:#e2e8f0;font-size:12px;line-height:1.2}.integration-node small{display:block;color:#64748b;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;margin-top:5px}.integration-node em{font-style:normal;font-size:9px;font-weight:900;color:#475569;margin-left:auto}.integration-column.right .integration-node em{margin-left:0;margin-right:auto}
+        .integration-node::after{content:'';width:7px;height:7px;border-radius:50%;background:#f59e0b;box-shadow:0 0 10px rgba(245,158,11,.8);position:absolute;top:11px;right:12px;animation:statusBlink 2s ease-in-out infinite}.integration-column.right .integration-node::after{left:12px;right:auto}.node-green::after{background:#34d399;box-shadow:0 0 10px rgba(52,211,153,.8)}
+        .integration-core { position:relative; z-index:5; width:230px;height:230px;margin:auto;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle,rgba(14,116,144,.25),rgba(2,8,23,.92) 64%);border:1px solid rgba(56,189,248,.45);box-shadow:0 0 0 12px rgba(56,189,248,.025),0 0 55px rgba(14,165,233,.22),inset 0 0 45px rgba(99,102,241,.12); animation:coreBreathe 3.8s ease-in-out infinite; }
+        .core-rings span{position:absolute;inset:-12px;border:1px solid rgba(56,189,248,.18);border-radius:50%;animation:coreRing 3.5s ease-out infinite}.core-rings span:nth-child(2){inset:-25px;animation-delay:1.1s;border-color:rgba(129,140,248,.12)}.core-rings span:nth-child(3){inset:-40px;animation-delay:2.2s;border-color:rgba(245,158,11,.08)}
+        .core-shield{width:58px;height:58px;border-radius:17px;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,rgba(56,189,248,.18),rgba(99,102,241,.15));border:1px solid rgba(56,189,248,.35);color:#7dd3fc;box-shadow:0 0 25px rgba(56,189,248,.15)}.core-shield svg{width:29px;height:29px}.core-title{font-size:20px;font-weight:900;color:#fff;letter-spacing:.02em;margin-top:9px}.core-subtitle{font-size:8px;font-weight:900;letter-spacing:.22em;color:#64748b;margin-top:2px}.core-status{margin-top:11px;padding:5px 9px;border-radius:999px;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.22);color:#6ee7b7;font-size:8px;font-weight:900;letter-spacing:.1em}.core-status span{display:inline-block;width:5px;height:5px;border-radius:50%;background:#34d399;box-shadow:0 0 8px #34d399;margin-right:4px;animation:statusBlink 1.6s infinite}.core-stream{position:absolute;bottom:23px;display:flex;gap:4px}.core-stream i{width:18px;height:2px;background:#38bdf8;opacity:.25;animation:streamBar 1.2s ease-in-out infinite}.core-stream i:nth-child(2){animation-delay:.2s}.core-stream i:nth-child(3){animation-delay:.4s}
+        .integration-legend{position:absolute;left:22px;right:22px;bottom:18px;display:flex;align-items:center;gap:16px;color:#64748b;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;z-index:6}.integration-legend span{display:inline-flex;align-items:center;gap:5px}.legend-dot{width:7px;height:7px;border-radius:50%;display:inline-block}.legend-dot.live{background:#34d399;box-shadow:0 0 8px #34d399}.legend-dot.mock{background:#a78bfa;box-shadow:0 0 8px #a78bfa}.legend-dot.planned{background:#64748b}.integration-tooltip{position:absolute;left:50%;bottom:52px;transform:translate(-50%,10px);opacity:0;pointer-events:none;z-index:8;min-width:230px;padding:10px 13px;border-radius:12px;background:rgba(2,8,23,.94);border:1px solid rgba(56,189,248,.3);box-shadow:0 12px 30px rgba(0,0,0,.35);transition:.25s ease}.integration-tooltip.show{opacity:1;transform:translate(-50%,0)}.integration-tooltip b{display:block;color:#7dd3fc;font-size:10px}.integration-tooltip span{display:block;color:#94a3b8;font-size:9px;margin-top:3px}
+        .integration-check{position:relative;overflow:hidden;transition:transform .3s ease,border-color .3s ease}.integration-check:hover{transform:translateY(-5px);border-color:rgba(56,189,248,.4)}.check-icon{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:10px;color:#67e8f9;background:rgba(56,189,248,.08);margin-bottom:10px}.check-icon svg{width:16px;height:16px}.integration-check b{font-size:11px;color:#e2e8f0}.integration-check p{font-size:9px;line-height:1.45;color:#64748b;margin-top:4px}
+        .integration-live-dot{width:7px;height:7px;border-radius:50%;background:#34d399;box-shadow:0 0 0 0 rgba(52,211,153,.55);animation:livePing 1.8s infinite}
+        @keyframes integrationGrid{from{background-position:0 0}to{background-position:34px 34px}} @keyframes integrationScan{0%{transform:translateY(0);opacity:0}15%{opacity:.7}50%{transform:translateY(590px);opacity:.55}85%{opacity:.7}100%{transform:translateY(0);opacity:0}} @keyframes pathFlow{to{stroke-dashoffset:-72}} @keyframes nodeFloat{0%,100%{translate:0 0}50%{translate:0 -4px}} @keyframes coreBreathe{0%,100%{scale:1}50%{scale:1.025}} @keyframes coreRing{0%{transform:scale(.92);opacity:0}25%{opacity:.8}100%{transform:scale(1.12);opacity:0}} @keyframes orbitRotate{to{transform:translate(-50%,-50%) rotate(360deg)}} @keyframes orbitRotateReverse{to{transform:translate(-50%,-50%) rotate(-360deg)}} @keyframes orbitPulse{0%,100%{opacity:.4}50%{opacity:.9}} @keyframes statusBlink{0%,100%{opacity:.55}50%{opacity:1}} @keyframes streamBar{0%,100%{transform:scaleX(.4);opacity:.2}50%{transform:scaleX(1);opacity:.9}} @keyframes livePing{0%{box-shadow:0 0 0 0 rgba(52,211,153,.55)}70%{box-shadow:0 0 0 8px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
+        @media(max-width:900px){.integration-map{min-height:760px}.integration-network{grid-template-columns:1fr;min-height:680px;gap:18px;padding:15px 4px 35px}.integration-lines,.integration-orbit{display:none}.integration-core{grid-row:1;width:190px;height:190px}.integration-column{height:auto;display:grid;grid-template-columns:1fr 1fr;gap:10px}.integration-column.left{grid-row:2}.integration-column.right{grid-row:3}.integration-node{width:100%;min-height:72px}.integration-column.right .integration-node{flex-direction:row;text-align:left}.integration-column.right .integration-node em{margin-left:auto;margin-right:0}.integration-column.right .integration-node::after{left:auto;right:12px}.integration-tooltip{bottom:52px}}
+        @media(max-width:520px){.integration-column{grid-template-columns:1fr}.integration-map{padding:10px}.integration-legend{left:12px;right:12px;gap:8px;flex-wrap:wrap}.integration-legend .ml-auto{display:none!important}}
+        html.light-mode .integration-node{background:rgba(255,255,255,.9);border-color:#d5dde8;box-shadow:0 10px 25px rgba(15,23,42,.08)} html.light-mode .integration-node b{color:#0f172a} html.light-mode .integration-grid-bg{opacity:.42;background-image:linear-gradient(rgba(3,105,161,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(3,105,161,.08) 1px,transparent 1px)} html.light-mode .integration-core{background:radial-gradient(circle,rgba(224,242,254,.95),rgba(255,255,255,.96) 65%);border-color:#7dd3fc;box-shadow:0 0 40px rgba(3,105,161,.12)} html.light-mode .core-title{color:#0f172a} html.light-mode .integration-tooltip{background:rgba(255,255,255,.97);border-color:#7dd3fc}
+        @media (prefers-reduced-motion:reduce){.integration-grid-bg,.integration-scanline,.integration-orbit,.integration-path,.integration-node,.integration-core,.core-rings span,.core-stream i,.integration-live-dot{animation:none!important}}
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans antialiased selection:bg-sky-500 selection:text-white overflow-x-hidden relative">
@@ -1174,6 +1275,8 @@
                     <i data-lucide="brain-circuit" class="w-4 h-4 shrink-0 text-purple-400"></i>
                     <span>AI Features</span>
                 </a>
+                <a href="#integrations" onclick="closeSidebar()" class="sidebar-link flex items-center gap-3 rounded-xl border border-transparent px-3 py-2.5 text-sm font-medium text-slate-300 hover:bg-slate-900 hover:text-sky-300 transition" data-section="integrations"><i data-lucide="network" class="w-4 h-4 shrink-0 text-sky-400"></i><span>Integrations</span></a>
+                <a href="#trust" onclick="closeSidebar()" class="sidebar-link flex items-center gap-3 rounded-xl border border-transparent px-3 py-2.5 text-sm font-medium text-slate-300 hover:bg-slate-900 hover:text-sky-300 transition" data-section="trust"><i data-lucide="shield-check" class="w-4 h-4 shrink-0 text-emerald-400"></i><span>Security & Pilot</span></a>
                 <a href="#architecture" onclick="closeSidebar()" class="sidebar-link flex items-center gap-3 rounded-xl border border-transparent px-3 py-2.5 text-sm font-medium text-slate-300 hover:bg-slate-900 hover:text-sky-300 transition" data-section="architecture">
                     <i data-lucide="git-branch" class="w-4 h-4 shrink-0 text-sky-400"></i>
                     <span>Architecture</span>
@@ -1211,9 +1314,9 @@
                 <div class="rounded-xl border border-slate-800/80 bg-slate-900/60 p-3">
                     <div class="flex items-center gap-2 text-xs font-semibold text-slate-200">
                         <span class="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,.8)]"></span>
-                        MoPNG & GeM Aligned
+                        Designed for GeM / GFR 2017 workflows
                     </div>
-                    <p class="mt-1 text-[11px] leading-relaxed text-slate-400">Conforming to GFR 2017 & GeM GTC / STC Procurement Guidelines.</p>
+                    <p class="mt-1 text-[11px] leading-relaxed text-slate-400">Designed around GeM workflows and applicable GFR 2017 procurement controls; not an official GeM endorsement.</p>
                 </div>
                 <div class="rounded-xl border border-slate-800/80 bg-slate-900/60 p-3">
                     <div class="flex items-center gap-2 text-xs font-semibold text-slate-200">
@@ -1289,8 +1392,7 @@
                     <i id="themeToggleIcon" data-lucide="sun" class="theme-icon w-3.5 h-3.5 text-amber-400"></i>
                     <span id="themeToggleLabel" class="theme-toggle-label">Light Mode</span>
                 </button>
-
-                <a href="#demo" class="relative group bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-400 hover:to-indigo-400 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm transition-all duration-300 shadow-lg shadow-sky-500/25 hover:shadow-sky-500/50 flex items-center gap-2 transform hover:-translate-y-0.5 overflow-hidden">
+<a href="#demo" class="relative group bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-400 hover:to-indigo-400 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm transition-all duration-300 shadow-lg shadow-sky-500/25 hover:shadow-sky-500/50 flex items-center gap-2 transform hover:-translate-y-0.5 overflow-hidden">
                     <span class="absolute inset-0 w-full h-full bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></span>
                     <i data-lucide="shield-check" class="w-4 h-4 text-slate-950"></i>
                     Verify Tender Bid
@@ -1359,151 +1461,27 @@
                     <p class="text-xs text-slate-400 mt-1">Structured Tender Lifecycle</p>
                 </div>
                 <div class="glass-card p-5 rounded-2xl border border-slate-800 hover:border-indigo-500/40 group">
-                    <p class="text-3xl font-extrabold text-indigo-400 group-hover:scale-105 transition-transform">100%</p>
-                    <p class="text-xs text-slate-400 mt-1">GeM & CPPP Compliance</p>
+                    <p class="text-3xl font-extrabold text-indigo-400 group-hover:scale-105 transition-transform">Target ≥95%</p>
+                    <p class="text-xs text-slate-400 mt-1">Clause-match precision</p>
                 </div>
                 <div class="glass-card p-5 rounded-2xl border border-slate-800 hover:border-emerald-500/40 group">
-                    <p class="text-3xl font-extrabold text-emerald-400 group-hover:scale-105 transition-transform">0%</p>
-                    <p class="text-xs text-slate-400 mt-1">Corrigenda Miss Rate</p>
+                    <p class="text-3xl font-extrabold text-emerald-400 group-hover:scale-105 transition-transform">Target: track</p>
+                    <p class="text-xs text-slate-400 mt-1">Corrigenda detection</p>
                 </div>
                 <div class="glass-card p-5 rounded-2xl border border-slate-800 hover:border-amber-500/40 group">
-                    <p class="text-3xl font-extrabold text-amber-400 group-hover:scale-105 transition-transform">10x</p>
-                    <p class="text-xs text-slate-400 mt-1">Faster Bid Evaluation</p>
+                    <p class="text-3xl font-extrabold text-amber-400 group-hover:scale-105 transition-transform">Target: measure</p>
+                    <p class="text-xs text-slate-400 mt-1">Officer time / bid</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Problem Statement Section -->
-    <section id="problem" class="py-20 sidebar-offset bg-slate-950 border-t border-slate-800/80 relative z-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-14">
-                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/25 text-rose-300 text-[10px] font-bold uppercase tracking-wider mb-4">
-                    <i data-lucide="alert-octagon" class="w-3.5 h-3.5"></i> The Problem — SIH 2026 PS #26100
-                </span>
-                <h2 class="text-3xl sm:text-4xl font-bold text-white">Manual Bid Verification Is Slow, Error‑Prone & Exploitable</h2>
-                <p class="text-slate-400 mt-3 max-w-3xl mx-auto">Every GeM tender today is cross-checked by procurement officers reading through hundreds of pages of EMD certificates, Udyam registrations, and technical/financial bids — clause by clause, by hand.</p>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-14">
-                <div class="glass-card p-6 rounded-2xl border border-rose-500/20">
-                    <div class="bg-rose-500/10 border border-rose-500/20 p-3 rounded-xl w-fit text-rose-400 mb-4"><i data-lucide="hourglass" class="w-5 h-5"></i></div>
-                    <h3 class="font-bold text-white mb-2">Delays at Scale</h3>
-                    <p class="text-sm text-slate-400 leading-relaxed">GeM handles a very high daily volume of bids across goods, services & works. Manually cross-checking EMD, Udyam and technical annexures for each one takes officers hours per bid, creating evaluation backlogs.</p>
-                </div>
-                <div class="glass-card p-6 rounded-2xl border border-amber-500/20">
-                    <div class="bg-amber-500/10 border border-amber-500/20 p-3 rounded-xl w-fit text-amber-400 mb-4"><i data-lucide="user-x" class="w-5 h-5"></i></div>
-                    <h3 class="font-bold text-white mb-2">Human Error</h3>
-                    <p class="text-sm text-slate-400 leading-relaxed">A single missed clause — an expired Udyam certificate, an unsigned affidavit, a mismatched UDIN — causes wrongful technical rejections, or worse, lets a non-compliant bid through evaluation.</p>
-                </div>
-                <div class="glass-card p-6 rounded-2xl border border-purple-500/20">
-                    <div class="bg-purple-500/10 border border-purple-500/20 p-3 rounded-xl w-fit text-purple-400 mb-4"><i data-lucide="shield-off" class="w-5 h-5"></i></div>
-                    <h3 class="font-bold text-white mb-2">Fraud Slips Through</h3>
-                    <p class="text-sm text-slate-400 leading-relaxed">Duplicate PAN/GSTIN across shell vendors, reused EMD bank-guarantee UTRs, and forged signatures are nearly impossible to catch by eye across thousands of concurrent tenders.</p>
-                </div>
-            </div>
-
-            <div id="outcomeCard" class="animated-border rounded-3xl bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900 border border-slate-800 p-8 sm:p-10 text-center">
-                <p class="outcome-label text-xs uppercase tracking-[0.2em] text-sky-400 font-bold mb-3">Our Outcome</p>
-                <p class="outcome-main text-2xl sm:text-3xl font-extrabold text-white leading-snug max-w-3xl mx-auto">BidSeva cuts document verification from <span class="gradient-text">~5 hours to under 3 minutes</span> per bid — while catching fraud patterns no manual reviewer can.</p>
-                <div class="mt-9 grid grid-cols-2 sm:grid-cols-4 gap-6" id="problemStatGrid">
-                    <div class="stat-reveal"><p class="text-2xl font-extrabold text-sky-400">1,684+</p><p class="text-[11px] text-slate-400 mt-1">New Bids Published Daily on GeM*</p></div>
-                    <div class="stat-reveal"><p class="text-2xl font-extrabold text-amber-400">₹1,172 Cr</p><p class="text-[11px] text-slate-400 mt-1">Avg. Daily GMV Transacted on GeM*</p></div>
-                    <div class="stat-reveal"><p class="text-2xl font-extrabold text-emerald-400">25.45L+</p><p class="text-[11px] text-slate-400 mt-1">Registered Sellers Competing for Bids*</p></div>
-                    <div class="stat-reveal"><p class="text-2xl font-extrabold text-rose-400">~700+</p><p class="text-[11px] text-slate-400 mt-1">Buyer/Seller Incidents Logged Daily*</p></div>
-                </div>
-                <p class="text-[10px] text-slate-500 mt-6">*Bid volume, daily GMV and incident-count figures per GeM's own official platform statistics (GeM SPV/PMU presentation, Oct 2025). Seller count per GeM public dashboard, Aug 2026. The ~5 hrs / &lt;3 min verification-time comparison quoted above is our working estimate of manual multi-document review effort per bid, to be validated against real officer timing data during pilot deployment.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- 7 Stages Section -->
-    <section id="stages" class="py-20 sidebar-offset bg-slate-950/80 border-t border-slate-800/80 relative z-10 backdrop-blur-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl font-bold text-white">The 7 Stages of Public Procurement in India</h2>
-                <p class="text-slate-400 mt-2 max-w-2xl mx-auto">Understanding how Indian government departments structure tenders from initial requirement to contract execution.</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Stage 1 -->
-                <div class="animated-border glass-card p-6 rounded-2xl border border-slate-800 hover:border-sky-500/50 group">
-                    <div class="flex items-center gap-4 mb-4">
-                        <span class="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/30 text-sky-400 font-bold flex items-center justify-center group-hover:bg-sky-500 group-hover:text-slate-950 transition-all duration-300">01</span>
-                        <h3 class="font-bold text-lg text-white">Requirement Identification</h3>
-                    </div>
-                    <p class="text-slate-400 text-sm leading-relaxed">Departments identify operational needs, budget allocations, and project scopes for infrastructure, goods, or services.</p>
-                </div>
-
-                <!-- Stage 2 -->
-                <div class="animated-border glass-card p-6 rounded-2xl border border-slate-800 hover:border-indigo-500/50 group">
-                    <div class="flex items-center gap-4 mb-4">
-                        <span class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 font-bold flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-slate-950 transition-all duration-300">02</span>
-                        <h3 class="font-bold text-lg text-white">Tender Document Prep</h3>
-                    </div>
-                    <p class="text-slate-400 text-sm leading-relaxed">Drafting technical specs, qualification criteria, EMD terms, payment conditions, and NIT (Notice Inviting Tender) details.</p>
-                </div>
-
-                <!-- Stage 3 -->
-                <div class="animated-border glass-card p-6 rounded-2xl border border-slate-800 hover:border-purple-500/50 group">
-                    <div class="flex items-center gap-4 mb-4">
-                        <span class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-400 font-bold flex items-center justify-center group-hover:bg-purple-500 group-hover:text-slate-950 transition-all duration-300">03</span>
-                        <h3 class="font-bold text-lg text-white">Tender Publication</h3>
-                    </div>
-                    <p class="text-slate-400 text-sm leading-relaxed">Official publishing on portals such as CPPP, GeM, state eProcurement portals, and national newspapers.</p>
-                </div>
-
-                <!-- Stage 4 -->
-                <div class="animated-border glass-card p-6 rounded-2xl border border-slate-800 hover:border-amber-500/50 group">
-                    <div class="flex items-center gap-4 mb-4">
-                        <span class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 font-bold flex items-center justify-center group-hover:bg-amber-500 group-hover:text-slate-950 transition-all duration-300">04</span>
-                        <h3 class="font-bold text-lg text-white">Pre-Bid Queries & Corrigenda</h3>
-                    </div>
-                    <p class="text-slate-400 text-sm leading-relaxed">Pre-bid meetings where vendors submit clarifications, leading to official corrigenda or addenda updates.</p>
-                </div>
-
-                <!-- Stage 5 -->
-                <div class="animated-border glass-card p-6 rounded-2xl border border-slate-800 hover:border-emerald-500/50 group">
-                    <div class="flex items-center gap-4 mb-4">
-                        <span class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-slate-950 transition-all duration-300">05</span>
-                        <h3 class="font-bold text-lg text-white">Submission of Bids</h3>
-                    </div>
-                    <p class="text-slate-400 text-sm leading-relaxed">Bidders upload digital signatures, EMD proofs, technical proposals, and financial quotes (BOQs) before deadlines.</p>
-                </div>
-
-                <!-- Stage 6 -->
-                <div class="animated-border glass-card p-6 rounded-2xl border border-slate-800 hover:border-rose-500/50 group">
-                    <div class="flex items-center gap-4 mb-4">
-                        <span class="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 font-bold flex items-center justify-center group-hover:bg-rose-500 group-hover:text-slate-950 transition-all duration-300">06</span>
-                        <h3 class="font-bold text-lg text-white">Evaluation & Comparison</h3>
-                    </div>
-                    <p class="text-slate-400 text-sm leading-relaxed">Two-cover evaluation: Technical bid verification followed by financial opening to identify the lowest valid L1 bidder.</p>
-                </div>
-            </div>
-
-            <!-- Stage 7 Dynamic Banner -->
-            <div class="mt-8 bg-gradient-to-r from-sky-900/30 via-indigo-900/30 to-purple-900/30 border border-sky-500/30 p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 backdrop-blur-xl relative overflow-hidden group">
-                <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-sky-500/10 rounded-full blur-2xl group-hover:bg-sky-500/20 transition-all"></div>
-                <div class="flex items-center gap-4 relative z-10">
-                    <span class="w-12 h-12 rounded-xl bg-sky-500 text-slate-950 font-extrabold text-lg flex items-center justify-center shrink-0 shadow-lg shadow-sky-500/30 group-hover:scale-110 transition-transform">07</span>
-                    <div>
-                        <h3 class="text-xl font-bold text-white">Stage 7: Award of Contract (LoA)</h3>
-                        <p class="text-slate-300 text-sm mt-1">Issuance of Letter of Award (LoA), submission of Performance Bank Guarantee (PBG), and official contract execution.</p>
-                    </div>
-                </div>
-                <a href="#demo" class="whitespace-nowrap bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold px-6 py-3 rounded-xl transition-all duration-300 shadow-lg shadow-sky-500/20 hover:shadow-sky-500/40 relative z-10">
-                    Verify Final Documents
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Verification Demo Section -->
-    <section id="demo" class="py-16 sidebar-offset bg-slate-900/60 border-y border-slate-800/80 relative z-10 backdrop-blur-lg">
+<section id="demo" class="py-16 sidebar-offset bg-slate-900/60 border-y border-slate-800/80 relative z-10 backdrop-blur-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-10">
-                <h2 class="text-2xl sm:text-3xl font-bold text-white">Live Verification & Dynamic Fee Engine</h2>
-                <p class="text-slate-400 text-sm mt-2">Upload Tender RFP and Vendor documents to dynamically analyze Tender Fee and EMD status in real time.</p>
+                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-300 text-[10px] font-bold uppercase tracking-wider mb-3"><i data-lucide="flask-conical" class="w-3.5 h-3.5"></i> Simulated with sample data</span>
+                <h2 class="text-2xl sm:text-3xl font-bold text-white">Live Verification & Bid Security Engine</h2>
+                <p class="text-slate-400 text-sm mt-2">Upload tender RFP and vendor documents to analyze bid-security, eligibility and compliance evidence.</p>
             </div>
 
             <!-- GeM Bid Reference Bar -->
@@ -1540,8 +1518,8 @@
                             <div class="text-[10px] font-black text-slate-700">TENDER FEE</div>
                             <span class="paper-line mid"></span><span class="paper-line short"></span><span class="paper-line"></span><span class="paper-line mid"></span>
                         </div>
-                        <div class="document-label">Tender Fee</div>
-                        <div class="document-detail">Payment gateway ref auto‑matched to bid ledger</div>
+                        <div class="document-label">Bid Security / EMD</div>
+                        <div class="document-detail">EMD reference auto‑matched to bid record</div>
                     </div>
                     <div class="document-node">
                         <div class="document-paper">
@@ -1634,8 +1612,8 @@
                         <div class="rounded-full h-12 w-12 border-4 border-sky-500/20 border-t-sky-400 animate-spin mx-auto mb-4"></div>
                         <i data-lucide="sparkles" class="w-5 h-5 text-sky-400 absolute top-3 left-3 animate-ping"></i>
                     </div>
-                    <p class="text-slate-200 font-semibold text-sm">Dynamically calculating EMD & Tender Fee parameters...</p>
-                    <p class="text-xs text-slate-400 mt-1">Analyzing financial clauses, exemption proofs, and BOQ values</p>
+                    <p class="text-slate-200 font-semibold text-sm">Dynamically checking Bid Security / EMD parameters...</p>
+                    <p class="text-xs text-slate-400 mt-1">Analyzing bid-security clauses, exemption proofs, and BOQ values</p>
                 </div>
 
                 <div id="resultsDashboard" class="space-y-6 transition-all duration-500">
@@ -1645,13 +1623,13 @@
                     </h3>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div id="cardTenderFee" class="glass-card border border-slate-800 p-4 rounded-2xl relative overflow-hidden group">
-                            <span class="text-xs text-slate-400 font-medium block">1. Tender Fee</span>
+                        <div id="cardBidSecurity" class="glass-card border border-slate-800 p-4 rounded-2xl relative overflow-hidden group">
+                            <span class="text-xs text-slate-400 font-medium block">1. Bid Security / EMD</span>
                             <div class="flex items-baseline justify-between mt-2">
-                                <span id="tenderFeeStatus" class="text-2xl font-extrabold text-emerald-400">Paid</span>
-                                <span id="tenderFeeBadge" class="text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/30 font-semibold shadow-sm">₹10,000 Verified</span>
+                                <span id="bidSecurityStatus" class="text-2xl font-extrabold text-emerald-400">Submitted</span>
+                                <span id="bidSecurityBadge" class="text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/30 font-semibold shadow-sm">UTR #992817263 Verified</span>
                             </div>
-                            <p id="tenderFeeDetail" class="text-xs text-slate-400 mt-2.5 leading-relaxed">Transaction UTR #992817263 verified via SBI e-Procurement Portal.</p>
+                            <p id="bidSecurityDetail" class="text-xs text-slate-400 mt-2.5 leading-relaxed">EMD UTR #992817263 submitted; transaction reference is used consistently throughout this simulated case.</p>
                         </div>
 
                         <div id="cardEMD" class="glass-card border border-slate-800 p-4 rounded-2xl relative overflow-hidden group">
@@ -1660,7 +1638,7 @@
                                 <span id="emdStatusText" class="text-2xl font-extrabold text-sky-400">Exempted</span>
                                 <span id="emdBadge" class="text-xs text-sky-400 bg-sky-500/10 px-2.5 py-1 rounded-md border border-sky-500/30 font-semibold shadow-sm">Udyam Verified</span>
                             </div>
-                            <p id="emdDetail" class="text-xs text-slate-400 mt-2.5 leading-relaxed">MSME Registration active; exemption granted as per Public Procurement Policy.</p>
+                            <p id="emdDetail" class="text-xs text-slate-400 mt-2.5 leading-relaxed">Udyam Registration verified; bidder is shown as eligible for the applicable bid-security treatment in this simulated case.</p>
                         </div>
 
                         <div class="glass-card border border-slate-800 p-4 rounded-2xl relative overflow-hidden group">
@@ -1704,8 +1682,8 @@
                                 </thead>
                                 <tbody class="divide-y divide-slate-800/50 text-slate-300">
                                     <tr class="hover:bg-slate-800/30 transition-colors">
-                                        <td class="p-4 font-medium text-white">1. Tender Fee Payment</td>
-                                        <td class="p-4 text-xs text-slate-400" id="matrixTenderDetail">RTGS Receipt #REC-88390 submitted and verified via portal.</td>
+                                        <td class="p-4 font-medium text-white">1. Bid Security / EMD Payment</td>
+                                        <td class="p-4 text-xs text-slate-400" id="matrixTenderDetail">EMD UTR #992817263 submitted and verified in the simulated bid record.</td>
                                         <td class="p-4" id="matrixTenderResult">
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                                                 <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Verified
@@ -1715,7 +1693,7 @@
                                     </tr>
                                     <tr class="hover:bg-slate-800/30 transition-colors">
                                         <td class="p-4 font-medium text-white">2. EMD / MSME Exemption Proof</td>
-                                        <td class="p-4 text-xs text-slate-400" id="matrixEmdDetail">Udyam Certificate #UDYAM-KR-03-00281 active & validated.</td>
+                                        <td class="p-4 text-xs text-slate-400" id="matrixEmdDetail">Udyam Certificate #UDYAM-GJ-01-1234567 active & validated.</td>
                                         <td class="p-4" id="matrixEmdResult">
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-sky-500/10 text-sky-400 border border-sky-500/20">
                                                 <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Exempted
@@ -1797,7 +1775,7 @@
                                                 <i data-lucide="trophy" class="w-3.5 h-3.5"></i> Rank 1 of 4
                                             </span>
                                         </td>
-                                        <td class="p-4 text-xs font-semibold text-emerald-400">L1 Qualified</td>
+                                        <td class="p-4 text-xs font-semibold text-emerald-400">L1 (provisional)</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -1836,7 +1814,7 @@
                                 <div class="shrink-0 p-2.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20"><i data-lucide="repeat" class="w-5 h-5"></i></div>
                                 <div class="min-w-0">
                                     <p class="text-sm font-semibold text-white">EMD Bank Guarantee UTR Reuse</p>
-                                    <p class="text-xs text-slate-400 mt-0.5">UTR #99281**** also appears on 1 other closed tender — flagged for manual recheck.</p>
+                                    <p class="text-xs text-slate-400 mt-0.5">EMD UTR #992817263 also appears on 1 other closed tender — flagged for manual recheck.</p>
                                 </div>
                                 <span class="ml-auto shrink-0 text-[10px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/25 px-2 py-1 rounded-full">Review</span>
                             </div>
@@ -1879,7 +1857,7 @@
                                         <td class="p-4 font-mono">42,18,500</td>
                                         <td class="p-4"><span class="font-semibold text-emerald-400">92%</span></td>
                                         <td class="p-4"><span class="text-[10px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/25 px-2 py-1 rounded-full">1 Review</span></td>
-                                        <td class="p-4"><span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><i data-lucide="trophy" class="w-3.5 h-3.5"></i> L1 Qualified</span></td>
+                                        <td class="p-4"><span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><i data-lucide="trophy" class="w-3.5 h-3.5"></i> L1 (provisional)</span></td>
                                     </tr>
                                     <tr class="hover:bg-slate-800/30 transition-colors">
                                         <td class="p-4 font-bold text-slate-400">#2</td>
@@ -1945,6 +1923,132 @@
         </div>
     </section>
 
+    <!-- Problem Statement Section -->
+    <section id="problem" class="py-20 sidebar-offset bg-slate-950 border-t border-slate-800/80 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-14">
+                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/25 text-rose-300 text-[10px] font-bold uppercase tracking-wider mb-4">
+                    <i data-lucide="alert-octagon" class="w-3.5 h-3.5"></i> The Problem — SIH 2026 PS #26100
+                </span>
+                <h2 class="text-3xl sm:text-4xl font-bold text-white">Manual Bid Verification Is Slow, Error‑Prone & Exploitable</h2>
+                <p class="text-slate-400 mt-3 max-w-3xl mx-auto">Every GeM tender today is cross-checked by procurement officers reading through hundreds of pages of EMD certificates, Udyam registrations, and technical/financial bids — clause by clause, by hand.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-14">
+                <div class="glass-card p-6 rounded-2xl border border-rose-500/20">
+                    <div class="bg-rose-500/10 border border-rose-500/20 p-3 rounded-xl w-fit text-rose-400 mb-4"><i data-lucide="hourglass" class="w-5 h-5"></i></div>
+                    <h3 class="font-bold text-white mb-2">Delays at Scale</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">GeM handles a very high daily volume of bids across goods, services & works. Manually cross-checking EMD, Udyam and technical annexures for each one takes officers hours per bid, creating evaluation backlogs.</p>
+                </div>
+                <div class="glass-card p-6 rounded-2xl border border-amber-500/20">
+                    <div class="bg-amber-500/10 border border-amber-500/20 p-3 rounded-xl w-fit text-amber-400 mb-4"><i data-lucide="user-x" class="w-5 h-5"></i></div>
+                    <h3 class="font-bold text-white mb-2">Human Error</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">A single missed clause — an expired Udyam certificate, an unsigned affidavit, a mismatched UDIN — causes wrongful technical rejections, or worse, lets a non-compliant bid through evaluation.</p>
+                </div>
+                <div class="glass-card p-6 rounded-2xl border border-purple-500/20">
+                    <div class="bg-purple-500/10 border border-purple-500/20 p-3 rounded-xl w-fit text-purple-400 mb-4"><i data-lucide="shield-off" class="w-5 h-5"></i></div>
+                    <h3 class="font-bold text-white mb-2">Fraud Slips Through</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Duplicate PAN/GSTIN across shell vendors, reused EMD bank-guarantee UTRs, and forged signatures are nearly impossible to catch by eye across thousands of concurrent tenders.</p>
+                </div>
+            </div>
+
+            <div id="outcomeCard" class="animated-border rounded-3xl bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900 border border-slate-800 p-8 sm:p-10 text-center">
+                <p class="outcome-label text-xs uppercase tracking-[0.2em] text-sky-400 font-bold mb-3">Our Outcome</p>
+                <p class="outcome-main text-2xl sm:text-3xl font-extrabold text-white leading-snug max-w-3xl mx-auto">BidSeva is designed to reduce repetitive document cross-checking while keeping the procurement officer in control. <span class="gradient-text">Pilot targets: ≥95% clause-match precision and measurable reduction in review time.</span></p>
+                <div class="mt-9 grid grid-cols-2 sm:grid-cols-4 gap-6" id="problemStatGrid">
+                    <div class="stat-reveal"><p class="text-2xl font-extrabold text-sky-400">1,684+</p><p class="text-[11px] text-slate-400 mt-1">New Bids Published Daily on GeM*</p></div>
+                    <div class="stat-reveal"><p class="text-2xl font-extrabold text-amber-400">₹1,172 Cr</p><p class="text-[11px] text-slate-400 mt-1">Avg. Daily GMV Transacted on GeM*</p></div>
+                    <div class="stat-reveal"><p class="text-2xl font-extrabold text-emerald-400">25.45L+</p><p class="text-[11px] text-slate-400 mt-1">Registered Sellers Competing for Bids*</p></div>
+                    <div class="stat-reveal"><p class="text-2xl font-extrabold text-rose-400">~700+</p><p class="text-[11px] text-slate-400 mt-1">Buyer/Seller Incidents Logged Daily*</p></div>
+                </div>
+                <p class="text-[10px] text-slate-500 mt-6">*Bid volume, daily GMV and incident-count figures per GeM's own official platform statistics (GeM SPV/PMU presentation, Oct 2025). Seller count per GeM public dashboard, Aug 2026. Target metrics are not production results; they will be measured during the proposed pilot against a labelled historical-bid sample.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7 Stages Section -->
+    <section id="stages" class="py-20 sidebar-offset bg-slate-950/80 border-t border-slate-800/80 relative z-10 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-white">The 7 Stages of Public Procurement in India</h2>
+                <p class="text-slate-400 mt-2 max-w-2xl mx-auto">Understanding how Indian government departments structure tenders from initial requirement to contract execution.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Stage 1 -->
+                <div class="animated-border glass-card p-6 rounded-2xl border border-slate-800 hover:border-sky-500/50 group">
+                    <div class="flex items-center gap-4 mb-4">
+                        <span class="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/30 text-sky-400 font-bold flex items-center justify-center group-hover:bg-sky-500 group-hover:text-slate-950 transition-all duration-300">01</span>
+                        <h3 class="font-bold text-lg text-white">Requirement Identification</h3>
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed">Departments identify operational needs, budget allocations, and project scopes for infrastructure, goods, or services.</p>
+                </div>
+
+                <!-- Stage 2 -->
+                <div class="animated-border glass-card p-6 rounded-2xl border border-slate-800 hover:border-indigo-500/50 group">
+                    <div class="flex items-center gap-4 mb-4">
+                        <span class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 font-bold flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-slate-950 transition-all duration-300">02</span>
+                        <h3 class="font-bold text-lg text-white">Tender Document Prep</h3>
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed">Drafting technical specs, qualification criteria, EMD terms, payment conditions, and NIT (Notice Inviting Tender) details.</p>
+                </div>
+
+                <!-- Stage 3 -->
+                <div class="animated-border glass-card p-6 rounded-2xl border border-slate-800 hover:border-purple-500/50 group">
+                    <div class="flex items-center gap-4 mb-4">
+                        <span class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-400 font-bold flex items-center justify-center group-hover:bg-purple-500 group-hover:text-slate-950 transition-all duration-300">03</span>
+                        <h3 class="font-bold text-lg text-white">Tender Publication</h3>
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed">Official publishing on portals such as CPPP, GeM, state eProcurement portals, and national newspapers.</p>
+                </div>
+
+                <!-- Stage 4 -->
+                <div class="animated-border glass-card p-6 rounded-2xl border border-slate-800 hover:border-amber-500/50 group">
+                    <div class="flex items-center gap-4 mb-4">
+                        <span class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 font-bold flex items-center justify-center group-hover:bg-amber-500 group-hover:text-slate-950 transition-all duration-300">04</span>
+                        <h3 class="font-bold text-lg text-white">Pre-Bid Queries & Corrigenda</h3>
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed">Pre-bid meetings where vendors submit clarifications, leading to official corrigenda or addenda updates.</p>
+                </div>
+
+                <!-- Stage 5 -->
+                <div class="animated-border glass-card p-6 rounded-2xl border border-slate-800 hover:border-emerald-500/50 group">
+                    <div class="flex items-center gap-4 mb-4">
+                        <span class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-slate-950 transition-all duration-300">05</span>
+                        <h3 class="font-bold text-lg text-white">Submission of Bids</h3>
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed">Bidders upload digital signatures, EMD proofs, technical proposals, and financial quotes (BOQs) before deadlines.</p>
+                </div>
+
+                <!-- Stage 6 -->
+                <div class="animated-border glass-card p-6 rounded-2xl border border-slate-800 hover:border-rose-500/50 group">
+                    <div class="flex items-center gap-4 mb-4">
+                        <span class="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 font-bold flex items-center justify-center group-hover:bg-rose-500 group-hover:text-slate-950 transition-all duration-300">06</span>
+                        <h3 class="font-bold text-lg text-white">Evaluation & Comparison</h3>
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed">Two-cover evaluation: Technical bid verification followed by financial opening to identify the lowest valid L1 bidder.</p>
+                </div>
+            </div>
+
+            <!-- Stage 7 Dynamic Banner -->
+            <div class="mt-8 bg-gradient-to-r from-sky-900/30 via-indigo-900/30 to-purple-900/30 border border-sky-500/30 p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 backdrop-blur-xl relative overflow-hidden group">
+                <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-sky-500/10 rounded-full blur-2xl group-hover:bg-sky-500/20 transition-all"></div>
+                <div class="flex items-center gap-4 relative z-10">
+                    <div>
+                        <h3 class="text-xl font-bold text-white">Award of Contract (LoA)</h3>
+                        <p class="text-slate-300 text-sm mt-1">Issuance of Letter of Award (LoA), submission of Performance Bank Guarantee (PBG), and official contract execution.</p>
+                    </div>
+                </div>
+                <a href="#demo" class="whitespace-nowrap bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold px-6 py-3 rounded-xl transition-all duration-300 shadow-lg shadow-sky-500/20 hover:shadow-sky-500/40 relative z-10">
+                    Verify Final Documents
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Verification Demo Section -->
+    
+
     <!-- Key Core Pillars Section -->
     <section id="features" class="py-20 sidebar-offset max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center mb-16">
@@ -1981,6 +2085,84 @@
                 <p class="text-slate-400 text-sm leading-relaxed">
                     Tracks corrigenda changes across the 7 stages and automatically validates MSME/NSIC EMD exemption proofs to prevent technical rejections.
                 </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Procurement Integration Map -->
+    <section id="integrations" class="py-20 sidebar-offset relative z-10 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-10">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-sky-500/25 bg-sky-500/5 text-sky-300 text-[10px] font-extrabold uppercase tracking-[0.16em] mb-4">
+                    <span class="integration-live-dot"></span> Verification Network
+                </div>
+                <h2 class="text-3xl sm:text-4xl font-bold text-white">Procurement Integration Map</h2>
+                <p class="text-slate-400 mt-3 max-w-3xl mx-auto text-sm leading-relaxed">BidSeva sits at the centre of the verification workflow, connecting bid records with document, identity, eligibility, security and audit sources. Status labels are intentionally explicit: they show the demo state, not a production connection.</p>
+            </div>
+
+            <div class="integration-map glass-card rounded-[2rem] border border-slate-800 p-4 sm:p-7 relative overflow-hidden">
+                <div class="integration-grid-bg"></div>
+                <div class="integration-scanline"></div>
+                <div class="integration-orbit orbit-one"></div>
+                <div class="integration-orbit orbit-two"></div>
+                <div class="integration-orbit orbit-three"></div>
+
+                <div class="integration-network">
+                    <svg class="integration-lines" viewBox="0 0 1000 620" preserveAspectRatio="none" aria-hidden="true">
+                        <defs>
+                            <linearGradient id="lineSky" x1="0" x2="1"><stop offset="0" stop-color="#38bdf8" stop-opacity=".08"/><stop offset=".5" stop-color="#38bdf8" stop-opacity=".9"/><stop offset="1" stop-color="#818cf8" stop-opacity=".12"/></linearGradient>
+                            <linearGradient id="lineGreen" x1="0" x2="1"><stop offset="0" stop-color="#34d399" stop-opacity=".08"/><stop offset=".5" stop-color="#34d399" stop-opacity=".85"/><stop offset="1" stop-color="#38bdf8" stop-opacity=".1"/></linearGradient>
+                            <filter id="lineGlow"><feGaussianBlur stdDeviation="2.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                        </defs>
+                        <path class="integration-path path-sky" d="M80 95 C250 95 310 260 420 300"/>
+                        <path class="integration-path path-sky" d="M80 300 C250 300 300 300 420 300"/>
+                        <path class="integration-path path-green" d="M80 505 C250 505 310 340 420 300"/>
+                        <path class="integration-path path-sky" d="M920 95 C750 95 690 260 580 300"/>
+                        <path class="integration-path path-green" d="M920 300 C750 300 700 300 580 300"/>
+                        <path class="integration-path path-sky" d="M920 505 C750 505 690 340 580 300"/>
+                        <circle class="data-pulse pulse-a" r="5"><animateMotion dur="3.6s" repeatCount="indefinite" path="M80 95 C250 95 310 260 420 300"/></circle>
+                        <circle class="data-pulse pulse-b" r="5"><animateMotion dur="3.1s" repeatCount="indefinite" path="M80 505 C250 505 310 340 420 300"/></circle>
+                        <circle class="data-pulse pulse-c" r="5"><animateMotion dur="3.4s" repeatCount="indefinite" path="M920 95 C750 95 690 260 580 300"/></circle>
+                        <circle class="data-pulse pulse-d" r="5"><animateMotion dur="3.8s" repeatCount="indefinite" path="M920 505 C750 505 690 340 580 300"/></circle>
+                    </svg>
+
+                    <div class="integration-column left">
+                        <div class="integration-node node-blue" data-source="GeM Bid Search API" data-state="Planned / API"><span class="node-icon"><i data-lucide="globe-2"></i></span><span><b>GeM Bid Search API</b><small>Planned / API</small></span><em>01</em></div>
+                        <div class="integration-node node-blue" data-source="GSTN / PAN" data-state="Planned"><span class="node-icon"><i data-lucide="badge-check"></i></span><span><b>GSTN / PAN</b><small>Planned</small></span><em>02</em></div>
+                        <div class="integration-node node-green" data-source="Udyam / NSIC" data-state="Mock"><span class="node-icon"><i data-lucide="building-2"></i></span><span><b>Udyam / NSIC</b><small>Mock</small></span><em>03</em></div>
+                    </div>
+
+                    <div class="integration-core">
+                        <div class="core-rings"><span></span><span></span><span></span></div>
+                        <div class="core-shield"><i data-lucide="shield-check"></i></div>
+                        <div class="core-title">BidSeva</div>
+                        <div class="core-subtitle">VERIFICATION CORE</div>
+                        <div class="core-status"><span></span> DEMO • RULES + AI</div>
+                        <div class="core-stream"><i></i><i></i><i></i></div>
+                    </div>
+
+                    <div class="integration-column right">
+                        <div class="integration-node node-purple" data-source="ICAI UDIN" data-state="Mock"><em>04</em><span><b>ICAI UDIN</b><small>Mock</small></span><span class="node-icon"><i data-lucide="file-check-2"></i></span></div>
+                        <div class="integration-node node-green" data-source="ePBG / Bank Checks" data-state="Rule"><em>05</em><span><b>ePBG / Bank Checks</b><small>Rule</small></span><span class="node-icon"><i data-lucide="landmark"></i></span></div>
+                        <div class="integration-node node-purple" data-source="CCA / DSC" data-state="Planned"><em>06</em><span><b>CCA / DSC</b><small>Planned</small></span><span class="node-icon"><i data-lucide="key-round"></i></span></div>
+                    </div>
+                </div>
+
+                <div class="integration-tooltip" id="integrationTooltip"><b>Verification source</b><span>Select a node to inspect its role.</span></div>
+
+                <div class="integration-legend">
+                    <span><i class="legend-dot live"></i> Demo / Rule</span>
+                    <span><i class="legend-dot mock"></i> Mock</span>
+                    <span><i class="legend-dot planned"></i> Planned</span>
+                    <span class="ml-auto hidden sm:inline-flex"><i data-lucide="radio" class="w-3 h-3"></i> Data-flow simulation</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-5">
+                <div class="integration-check glass-card p-4 rounded-2xl border border-slate-800"><div class="check-icon"><i data-lucide="badge-check"></i></div><b>MSE / Startup</b><p>Bid-security and eligibility relaxation checks.</p></div>
+                <div class="integration-check glass-card p-4 rounded-2xl border border-slate-800"><div class="check-icon"><i data-lucide="map-pin-check"></i></div><b>Make in India</b><p>Local-content declaration and category checks.</p></div>
+                <div class="integration-check glass-card p-4 rounded-2xl border border-slate-800"><div class="check-icon"><i data-lucide="file-signature"></i></div><b>Integrity Pact</b><p>Presence, signatures and declarations.</p></div>
+                <div class="integration-check glass-card p-4 rounded-2xl border border-slate-800"><div class="check-icon"><i data-lucide="shield-alert"></i></div><b>Debarment / Blacklist</b><p>Planned source check with explainable flags.</p></div>
             </div>
         </div>
     </section>
@@ -2036,41 +2218,52 @@
         </div>
     </section>
 
+    <!-- Trust, Security, Pilot & Audit -->
+    <section id="trust" class="py-20 sidebar-offset relative z-10">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="glass-card rounded-2xl border border-slate-800 p-6"><h3 class="text-lg font-bold text-white flex items-center gap-2"><i data-lucide="shield" class="w-5 h-5 text-emerald-400"></i> Security & Data</h3><ul class="mt-4 space-y-3 text-xs text-slate-400"><li>• Deployment target: India data residency where required by the implementing authority.</li><li>• Hosting options: NIC/MeghRaj or approved on-prem infrastructure.</li><li>• Role-based access, least privilege, encryption in transit/at rest and immutable audit events.</li><li>• DPDP Act considerations: purpose limitation, access control, retention and lawful processing to be mapped with the pilot authority.</li></ul></div>
+          <div class="glass-card rounded-2xl border border-slate-800 p-6"><h3 class="text-lg font-bold text-white flex items-center gap-2"><i data-lucide="calendar-range" class="w-5 h-5 text-sky-400"></i> Pilot Roadmap</h3><div class="mt-4 space-y-3 text-xs"><div class="p-3 rounded-xl bg-sky-500/5 border border-sky-500/20"><b class="text-white">Months 1–3</b><p class="text-slate-400 mt-1">50 historical bids; label clauses/flags; measure officer time, precision and recall.</p></div><div class="p-3 rounded-xl bg-indigo-500/5 border border-indigo-500/20"><b class="text-white">Gate</b><p class="text-slate-400 mt-1">Compare model/rule results with officer adjudication before production use.</p></div><div class="p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/20"><b class="text-white">Scale only after evidence</b><p class="text-slate-400 mt-1">Expand document types and integrations after measured performance and security review.</p></div></div></div>
+          <div class="glass-card rounded-2xl border border-slate-800 p-6"><h3 class="text-lg font-bold text-white flex items-center gap-2"><i data-lucide="link-2" class="w-5 h-5 text-purple-400"></i> Hash-Chained Audit Log</h3><div class="mt-4 space-y-2 font-mono text-[10px]"><div class="p-3 rounded-lg bg-slate-900/60 border border-slate-800"><span class="text-emerald-400">#000184</span> VERIFY_EMD <span class="text-slate-500">09:42:11</span><br><span class="text-slate-500">prev:</span> 7f91…a3 <span class="text-slate-500">hash:</span> c82e…19</div><div class="p-3 rounded-lg bg-slate-900/60 border border-slate-800"><span class="text-amber-400">#000185</span> FLAG_UDIN <span class="text-slate-500">09:42:14</span><br><span class="text-slate-500">prev:</span> c82e…19 <span class="text-slate-500">hash:</span> 2aa4…71</div><div class="p-3 rounded-lg bg-slate-900/60 border border-slate-800"><span class="text-sky-400">#000186</span> OFFICER_REVIEW <span class="text-slate-500">09:43:02</span><br><span class="text-slate-500">prev:</span> 2aa4…71 <span class="text-slate-500">hash:</span> 9d14…4b</div></div><p class="text-[10px] text-slate-500 mt-3">Demo viewer only; production hashes should be generated server-side and independently retained.</p></div>
+        </div>
+      </div>
+    </section>
+
     <!-- Impact / Metrics Section -->
     <section id="impact" class="py-20 sidebar-offset max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center mb-14">
-            <h2 class="text-3xl font-bold text-white">Projected Impact</h2>
-            <p class="text-slate-400 mt-2 max-w-2xl mx-auto">Estimated from typical GeM tender volumes and manual evaluation benchmarks — to be validated with real data during pilot deployment.</p>
+            <h2 class="text-3xl font-bold text-white">Evaluation Metrics</h2>
+            <p class="text-slate-400 mt-2 max-w-2xl mx-auto">No production performance claim is made here. The pilot will measure these metrics on a labelled sample of historical bids.</p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
             <div class="lg:col-span-2 glass-card border border-slate-800 rounded-2xl p-7">
-                <h4 class="text-sm font-bold text-white mb-6 flex items-center gap-2"><i data-lucide="timer" class="w-4 h-4 text-sky-400"></i> Verification Time per Bid</h4>
+                <h4 class="text-sm font-bold text-white mb-6 flex items-center gap-2"><i data-lucide="chart-no-axes-combined" class="w-4 h-4 text-sky-400"></i> Defensible pilot metrics</h4>
                 <div class="space-y-5">
                     <div>
-                        <div class="flex justify-between text-xs text-slate-400 mb-1.5"><span>Manual Review (Today)</span><span class="font-bold text-amber-400">~300 min</span></div>
-                        <div class="impact-bar-track"><div class="impact-bar bg-gradient-to-r from-amber-500 to-rose-500" style="width:0%" data-target="100"></div></div>
+                        <div class="flex justify-between text-xs text-slate-400 mb-1.5"><span>Flag precision</span><span class="font-bold text-amber-400">Target ≥95%</span></div>
+                        <div class="impact-bar-track"><div class="impact-bar bg-gradient-to-r from-amber-500 to-rose-500" style="width:0%" data-target="95"></div></div>
                     </div>
                     <div>
-                        <div class="flex justify-between text-xs text-slate-400 mb-1.5"><span>With BidSeva</span><span class="font-bold text-emerald-400">~3 min</span></div>
-                        <div class="impact-bar-track"><div class="impact-bar bg-gradient-to-r from-sky-500 to-emerald-500" style="width:0%" data-target="3"></div></div>
+                        <div class="flex justify-between text-xs text-slate-400 mb-1.5"><span>Flag recall</span><span class="font-bold text-emerald-400">Measure on 50 bids</span></div>
+                        <div class="impact-bar-track"><div class="impact-bar bg-gradient-to-r from-sky-500 to-emerald-500" style="width:0%" data-target="75"></div></div>
                     </div>
                 </div>
-                <p class="text-[11px] text-slate-500 mt-6">A large reduction in officer time spent per bid on document cross-checking, freeing capacity for judgment calls that genuinely need a human.</p>
+                <p class="text-[11px] text-slate-500 mt-6">Also measure false-positive rate, false-negative rate and median officer time per bid; publish the labelled-sample methodology alongside results.</p>
             </div>
 
             <div class="grid grid-cols-1 gap-5">
                 <div class="glass-card border border-slate-800 rounded-2xl p-6 text-center">
-                    <p class="text-3xl font-extrabold text-rose-400">Meaningful Share</p>
-                    <p class="text-xs text-slate-400 mt-1.5">of GeM bid rejections today trace back to document/clause mismatches, not genuine ineligibility*</p>
+                    <p class="text-3xl font-extrabold text-rose-400">False-positive rate</p>
+                    <p class="text-xs text-slate-400 mt-1.5">percentage of flags that officers overturn during adjudication</p>
                 </div>
                 <div class="glass-card border border-slate-800 rounded-2xl p-6 text-center">
-                    <p class="text-3xl font-extrabold text-purple-400">Early Signal</p>
-                    <p class="text-xs text-slate-400 mt-1.5">bids flagged by the fraud engine for duplicate identity or reused financial instruments during pilot testing*</p>
+                    <p class="text-3xl font-extrabold text-purple-400">Time per bid</p>
+                    <p class="text-xs text-slate-400 mt-1.5">median officer minutes spent reviewing a bid before and after assistance</p>
                 </div>
             </div>
         </div>
-        <p class="text-[10px] text-slate-500 mt-6 text-center">*Illustrative figures for problem framing — to be validated against real GeM data during pilot deployment.</p>
+        <p class="text-[10px] text-slate-500 mt-6 text-center">*Pilot metrics are targets/measurement definitions, not measured production results.</p>
     </section>
 
     <!-- Footer -->
@@ -2082,6 +2275,7 @@
 
     <!-- Application Script -->
     <script>
+        // ===== BidSeva Hindi / English demo toggle =====
         // ===== BidSeva Theme Controller =====
         const THEME_KEY = 'bidseva-theme';
         function applyTheme(theme) {
@@ -2650,9 +2844,24 @@
             }
         }
 
+        // ===== Integration Map interactions =====
+        document.querySelectorAll('.integration-node').forEach(node => {
+            node.addEventListener('click', () => {
+                document.querySelectorAll('.integration-node').forEach(n => n.classList.remove('selected'));
+                node.classList.add('selected');
+                const tip = document.getElementById('integrationTooltip');
+                if (tip) {
+                    tip.innerHTML = '<b>' + node.dataset.source + '</b><span>Status: ' + node.dataset.state + ' • Verification hand-off simulated in this demo.</span>';
+                    tip.classList.add('show');
+                    clearTimeout(window.integrationTipTimer);
+                    window.integrationTipTimer = setTimeout(() => tip.classList.remove('show'), 3200);
+                }
+            });
+        });
+
         // Sidebar Navigation Handling
         const sidebarLinks = document.querySelectorAll('.sidebar-link');
-        const trackedSections = ['top', 'problem', 'stages', 'demo', 'features', 'architecture', 'impact']
+        const trackedSections = ['top', 'problem', 'stages', 'demo', 'features', 'integrations', 'architecture', 'trust', 'impact']
             .map(id => document.getElementById(id))
             .filter(Boolean);
 
