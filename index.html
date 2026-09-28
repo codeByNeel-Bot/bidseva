@@ -1,0 +1,2597 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BidSeva - GeM Bid Procurement & Compliance Verification</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            900: '#0c4a6e',
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 4s ease-in-out infinite',
+                        'float-delayed': 'float 4s ease-in-out 2s infinite',
+                        'glow': 'glow 3s ease-in-out infinite alternate',
+                        'shimmer': 'shimmer 2.5s infinite linear',
+                        'radar-spin': 'radarSpin 12s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        glow: {
+                            '0%': { opacity: '0.3', filter: 'drop-shadow(0 0 15px rgba(56, 189, 248, 0.3))' },
+                            '100%': { opacity: '0.8', filter: 'drop-shadow(0 0 35px rgba(129, 140, 248, 0.8))' }
+                        },
+                        shimmer: {
+                            '0%': { backgroundPosition: '-200% 0' },
+                            '100%': { backgroundPosition: '200% 0' }
+                        },
+                        radarSpin: {
+                            '0%': { transform: 'rotate(0deg)' },
+                            '100%': { transform: 'rotate(360deg)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-text {
+            background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #f59e0b 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 6s ease infinite;
+        }
+        
+        .animated-border {
+            position: relative;
+        }
+        .animated-border::after {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            background: linear-gradient(90deg, #0284c7, #6366f1, #f59e0b, #0284c7);
+            background-size: 300% 100%;
+            border-radius: inherit;
+            z-index: -1;
+            opacity: 0.2;
+            transition: opacity 0.4s ease, filter 0.4s ease;
+            animation: shimmer 8s linear infinite;
+        }
+        .animated-border:hover::after {
+            opacity: 1;
+            filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.5));
+        }
+
+        /* Highlight pulse on dynamic updates */
+        .value-updated {
+            animation: pulseGlow 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes pulseGlow {
+            0% { transform: scale(1.08); filter: drop-shadow(0 0 20px #38bdf8); }
+            50% { transform: scale(1.03); filter: drop-shadow(0 0 25px rgba(99, 102, 241, 0.8)); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 0px transparent); }
+        }
+
+        /* Glass Cards with Tilt Smoothness */
+        .glass-card {
+            background: rgba(15, 23, 42, 0.78);
+            backdrop-filter: blur(14px);
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        .glass-card:hover {
+            transform: translateY(-4px) scale(1.01);
+        }
+
+        /* Dynamic Background Radar Overlay */
+        .radar-sweep-bg {
+            background: conic-gradient(from 0deg at 50% 50%, rgba(56, 189, 248, 0.12) 0deg, rgba(56, 189, 248, 0) 60deg, transparent 360deg);
+            border-radius: 50%;
+        }
+
+        /* Responsive Sidebar */
+        :root { --sidebar-width: 17rem; }
+
+        #appSidebar {
+            width: var(--sidebar-width);
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.sidebar-open #appSidebar {
+            transform: translateX(0);
+        }
+
+        #sidebarBackdrop {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        body.sidebar-open #sidebarBackdrop {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .sidebar-offset {
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @media (min-width: 1024px) {
+            body.sidebar-open .sidebar-offset {
+                margin-left: var(--sidebar-width);
+            }
+        }
+
+        .sidebar-link.active {
+            background: rgba(14, 165, 233, 0.12);
+            color: #7dd3fc;
+            border-color: rgba(56, 189, 248, 0.2);
+        }
+
+        .sidebar-link.active::before {
+            content: '';
+            position: absolute;
+            left: -1px;
+            top: 0.55rem;
+            bottom: 0.55rem;
+            width: 3px;
+            border-radius: 999px;
+            background: #38bdf8;
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.7);
+        }
+
+        /* ===== GeM Procurement Verification Dynamic Background ===== */
+        #bgContainer {
+            perspective: 1200px;
+        }
+
+        .procurement-grid {
+            position: absolute;
+            inset: 0;
+            opacity: .18;
+            background-image:
+                linear-gradient(rgba(56,189,248,.12) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(56,189,248,.12) 1px, transparent 1px);
+            background-size: 58px 58px;
+            transform: perspective(700px) rotateX(62deg) scale(1.8) translateY(18%);
+            transform-origin: center bottom;
+            animation: gridDrift 18s linear infinite;
+        }
+
+        .procurement-scan {
+            position: absolute;
+            left: -10%;
+            right: -10%;
+            top: 50%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(56,189,248,.15), #38bdf8, rgba(245,158,11,.75), transparent);
+            box-shadow: 0 0 22px rgba(56,189,248,.7), 0 0 55px rgba(245,158,11,.25);
+            opacity: .8;
+            animation: procurementScan 7s ease-in-out infinite;
+        }
+
+        .procurement-scan::before,
+        .procurement-scan::after {
+            content: "";
+            position: absolute;
+            top: -8px;
+            width: 18px;
+            height: 18px;
+            border: 1px solid rgba(56,189,248,.8);
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(56,189,248,.6);
+        }
+        .procurement-scan::before { left: 24%; }
+        .procurement-scan::after { right: 28%; border-color: rgba(245,158,11,.8); }
+
+        .verification-orbit {
+            position: absolute;
+            width: min(72vw, 850px);
+            height: min(72vw, 850px);
+            left: 50%;
+            top: 46%;
+            transform: translate(-50%, -50%);
+            border: 1px solid rgba(56,189,248,.10);
+            border-radius: 50%;
+            box-shadow:
+                0 0 80px rgba(56,189,248,.05),
+                inset 0 0 80px rgba(99,102,241,.04);
+        }
+
+        .verification-orbit::before,
+        .verification-orbit::after {
+            content: "";
+            position: absolute;
+            inset: 11%;
+            border: 1px dashed rgba(99,102,241,.13);
+            border-radius: 50%;
+        }
+        .verification-orbit::after {
+            inset: 27%;
+            border-color: rgba(245,158,11,.12);
+        }
+
+        .verification-orbit .orbit-dot {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #38bdf8;
+            box-shadow: 0 0 15px #38bdf8, 0 0 35px rgba(56,189,248,.65);
+            left: 50%;
+            top: -4px;
+            transform-origin: 0 calc(min(72vw, 850px) / 2);
+            animation: orbitSpin 14s linear infinite;
+        }
+
+        .verification-badge {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 10px;
+            border: 1px solid rgba(56,189,248,.20);
+            background: rgba(2,8,23,.42);
+            backdrop-filter: blur(8px);
+            border-radius: 10px;
+            color: rgba(186,230,253,.8);
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            box-shadow: 0 8px 30px rgba(0,0,0,.18);
+            animation: badgeFloat 5s ease-in-out infinite;
+        }
+        .verification-badge span {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #34d399;
+            box-shadow: 0 0 9px #34d399;
+        }
+        .verification-badge.b1 { left: 8%; top: 27%; animation-delay: -.8s; }
+        .verification-badge.b2 { right: 8%; top: 34%; animation-delay: -2.2s; }
+        .verification-badge.b3 { left: 15%; bottom: 22%; animation-delay: -3.6s; }
+        .verification-badge.b4 { right: 13%; bottom: 19%; animation-delay: -1.5s; }
+
+        .document-stream {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+        }
+        .document-stream i {
+            position: absolute;
+            width: 22px;
+            height: 28px;
+            border: 1px solid rgba(148,163,184,.18);
+            border-radius: 4px;
+            background: linear-gradient(135deg, rgba(56,189,248,.09), rgba(99,102,241,.04));
+            transform: rotate(45deg);
+            animation: documentFloat 12s linear infinite;
+            opacity: 0;
+        }
+        .document-stream i::after {
+            content: "";
+            position: absolute;
+            left: 5px; right: 5px; top: 8px;
+            height: 1px;
+            background: rgba(56,189,248,.35);
+            box-shadow: 0 5px rgba(56,189,248,.18), 0 10px rgba(245,158,11,.16);
+        }
+        .document-stream i:nth-child(1) { left: 12%; animation-delay: -2s; }
+        .document-stream i:nth-child(2) { left: 28%; animation-delay: -8s; }
+        .document-stream i:nth-child(3) { left: 47%; animation-delay: -5s; }
+        .document-stream i:nth-child(4) { left: 66%; animation-delay: -10s; }
+        .document-stream i:nth-child(5) { left: 82%; animation-delay: -1s; }
+
+        @keyframes gridDrift {
+            from { background-position: 0 0, 0 0; }
+            to { background-position: 58px 58px, 58px 58px; }
+        }
+        @keyframes procurementScan {
+            0%, 100% { transform: translateY(-34vh) scaleX(.72); opacity: 0; }
+            12% { opacity: .85; }
+            50% { transform: translateY(34vh) scaleX(1); opacity: .9; }
+            88% { opacity: .85; }
+        }
+        @keyframes orbitSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes badgeFloat {
+            0%, 100% { transform: translate3d(0,0,0); }
+            50% { transform: translate3d(0,-8px,0); }
+        }
+        @keyframes documentFloat {
+            0% { transform: translate3d(0,110vh,0) rotate(45deg); opacity: 0; }
+            12% { opacity: .42; }
+            72% { opacity: .20; }
+            100% { transform: translate3d(80px,-25vh,0) rotate(225deg); opacity: 0; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .procurement-grid,
+            .procurement-scan,
+            .verification-orbit .orbit-dot,
+            .verification-badge,
+            .document-stream i {
+                animation: none !important;
+            }
+        }
+
+
+
+
+        /* ===== GeM Bid Procurement Verification Logo ===== */
+        .gem-logo {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            border-radius: 12px;
+            background:
+                radial-gradient(circle at 50% 48%, rgba(255,255,255,.96) 0 18%, transparent 19%),
+                linear-gradient(145deg, #ff9933 0 31%, #f8fafc 31% 67%, #138808 67% 100%);
+            border: 1px solid rgba(255,255,255,.42);
+            box-shadow: 0 0 0 2px rgba(2,132,199,.18), 0 7px 22px rgba(2,132,199,.28);
+            overflow: hidden;
+        }
+        .gem-logo::before {
+            content: "";
+            position: absolute;
+            inset: 3px;
+            border-radius: 9px;
+            background: #061326;
+            opacity: .92;
+        }
+        .gem-logo::after {
+            content: "";
+            position: absolute;
+            left: 18%;
+            right: 18%;
+            bottom: 4px;
+            height: 2px;
+            background: linear-gradient(90deg,#ff9933 0 33.33%,#fff 33.33% 66.66%,#138808 66.66%);
+            border-radius: 99px;
+            z-index: 5;
+        }
+        .gem-logo-sidebar { width: 46px; height: 46px; }
+        .gem-logo-header { width: 42px; height: 42px; }
+        .gem-logo-ring {
+            position: absolute;
+            width: 58%;
+            height: 58%;
+            border: 2px solid #38bdf8;
+            border-radius: 50%;
+            z-index: 2;
+            box-shadow: 0 0 9px rgba(56,189,248,.42);
+        }
+        .gem-logo-ring::before,
+        .gem-logo-ring::after {
+            content: "";
+            position: absolute;
+            inset: 4px;
+            border: 1px solid rgba(129,140,248,.65);
+            border-radius: 50%;
+        }
+        .gem-logo-ring::after {
+            inset: -1px;
+            border-color: rgba(245,158,11,.55);
+            transform: rotate(45deg);
+        }
+        .gem-logo-check {
+            position: relative;
+            z-index: 4;
+            margin-top: -1px;
+            color: #34d399;
+            font-size: 14px;
+            line-height: 1;
+            font-weight: 1000;
+            text-shadow: 0 0 7px rgba(52,211,153,.7);
+        }
+        .gem-logo-doc {
+            position: absolute;
+            z-index: 3;
+            width: 7px;
+            height: 10px;
+            right: 5px;
+            top: 6px;
+            border: 1px solid #f8fafc;
+            border-radius: 1px;
+            transform: rotate(8deg);
+            opacity: .9;
+        }
+        .gem-logo-doc::after {
+            content: "";
+            position: absolute;
+            left: 1px;
+            right: 1px;
+            top: 3px;
+            height: 1px;
+            background: #38bdf8;
+            box-shadow: 0 3px #38bdf8;
+        }
+        .group:hover .gem-logo {
+            box-shadow: 0 0 0 2px rgba(56,189,248,.28), 0 0 22px rgba(56,189,248,.35);
+        }
+\n        /* ===== GeM visual identity accents ===== */
+        .tricolor-strip {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            z-index: 120;
+            background: linear-gradient(90deg, #ff9933 0 33.333%, #ffffff 33.333% 66.666%, #138808 66.666% 100%);
+            box-shadow: 0 1px 12px rgba(255,153,51,.28);
+        }
+        header { top: 4px; }
+        .chakra-wheel {
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #60a5fa;
+            flex: 0 0 auto;
+        }
+        .chakra-wheel svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 7px rgba(96,165,250,.28));
+        }
+        .gem-integrated-badge {
+            position: relative;
+            overflow: hidden;
+        }
+        .gem-integrated-badge::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ff9933 0 33.333%, #ffffff 33.333% 66.666%, #138808 66.666% 100%);
+        }
+        .document-trail {
+            position: relative;
+            display: flex;
+            align-items: stretch;
+            gap: 0;
+        }
+        .document-trail::before {
+            content: "";
+            position: absolute;
+            left: 5%;
+            right: 5%;
+            top: 52%;
+            height: 2px;
+            border-top: 1px dashed rgba(148,163,184,.38);
+            background: linear-gradient(90deg, transparent, rgba(56,189,248,.6), transparent);
+            background-size: 55% 100%;
+            background-repeat: no-repeat;
+            animation: baseLineFlow 5s linear infinite;
+            z-index: 0;
+        }
+        @keyframes baseLineFlow {
+            0% { background-position: -55% 0; }
+            100% { background-position: 155% 0; }
+        }
+        .document-node {
+            position: relative;
+            z-index: 1;
+            flex: 1 1 0;
+            min-width: 0;
+        }
+        .document-paper {
+            position: relative;
+            min-height: 112px;
+            margin: 0 auto;
+            max-width: 145px;
+            padding: 14px 11px 10px;
+            border: 1px solid rgba(148,163,184,.24);
+            border-radius: 9px;
+            background: linear-gradient(145deg, rgba(248,250,252,.97), rgba(226,232,240,.92));
+            box-shadow: 0 12px 30px rgba(0,0,0,.24), 0 0 0 4px rgba(15,23,42,.55);
+            transform: rotate(-1.5deg);
+            transition: transform .25s ease, box-shadow .25s ease;
+        }
+        .document-node:nth-child(even) .document-paper { transform: rotate(1.5deg); }
+        .document-node:hover .document-paper {
+            transform: translateY(-6px) rotate(0deg) scale(1.035);
+            box-shadow: 0 18px 35px rgba(0,0,0,.32), 0 0 0 4px rgba(56,189,248,.08);
+        }
+        /* idle breathing motion while a document is still awaiting verification */
+        .document-node:not(.scanning):not(.verified):not(.open):not(:hover) .document-paper {
+            animation: docIdleBob 3.2s ease-in-out infinite;
+        }
+        .document-node:nth-child(2) .document-paper { animation-delay: .3s !important; }
+        .document-node:nth-child(3) .document-paper { animation-delay: .6s !important; }
+        .document-node:nth-child(4) .document-paper { animation-delay: .9s !important; }
+        .document-node:nth-child(5) .document-paper { animation-delay: 1.2s !important; }
+        @keyframes docIdleBob {
+            0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+            50% { transform: translateY(-4px) rotate(-1.5deg); }
+        }
+        .document-node:nth-child(even):not(.scanning):not(.verified):not(.open):not(:hover) .document-paper {
+            animation-name: docIdleBobEven;
+        }
+        @keyframes docIdleBobEven {
+            0%, 100% { transform: translateY(0) rotate(1.5deg); }
+            50% { transform: translateY(-4px) rotate(1.5deg); }
+        }
+        .document-paper::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            right: -1px;
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, transparent 49%, #cbd5e1 50%);
+            border-left: 1px solid #cbd5e1;
+            border-bottom: 1px solid #cbd5e1;
+            border-radius: 0 9px 0 0;
+        }
+        .document-paper .paper-line {
+            display: block;
+            height: 4px;
+            border-radius: 999px;
+            background: #94a3b8;
+            opacity: .65;
+            margin-top: 6px;
+        }
+        .document-paper .paper-line.short { width: 58%; }
+        .document-paper .paper-line.mid { width: 78%; }
+        .document-status {
+            position: absolute;
+            right: -4px;
+            top: -9px;
+            width: 25px;
+            height: 25px;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #052e1a;
+            border: 2px solid #34d399;
+            color: #6ee7b7;
+            box-shadow: 0 0 14px rgba(52,211,153,.28);
+        }
+        .document-label {
+            margin-top: 10px;
+            text-align: center;
+            color: #cbd5e1;
+            font-size: 10px;
+            line-height: 1.2;
+            font-weight: 800;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+        }
+        .document-connector {
+            display: none;
+        }
+        @media (max-width: 767px) {
+            .document-trail {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0,1fr));
+                gap: 18px;
+            }
+            .document-trail::before { display: none; }
+            .document-node:last-child { grid-column: 1 / -1; }
+        }
+
+        /* ===== Document Verification Trail — dynamic interactions ===== */
+        .document-progress {
+            position: absolute;
+            left: 5%;
+            right: 95%;
+            top: 52%;
+            height: 2px;
+            background: linear-gradient(90deg, #38bdf8, #818cf8, #34d399);
+            box-shadow: 0 0 10px rgba(56,189,248,.65);
+            border-radius: 999px;
+            z-index: 0;
+            transition: right 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @media (max-width: 767px) { .document-progress { display: none; } }
+
+        .document-node {
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(16px) scale(.94);
+            animation: docNodeIn .6s cubic-bezier(0.2,0.8,0.2,1) forwards;
+            animation-play-state: paused;
+        }
+        .document-trail.in-view .document-node { animation-play-state: running; }
+        .document-trail.in-view .document-node:nth-child(1) { animation-delay: .05s; }
+        .document-trail.in-view .document-node:nth-child(2) { animation-delay: .15s; }
+        .document-trail.in-view .document-node:nth-child(3) { animation-delay: .25s; }
+        .document-trail.in-view .document-node:nth-child(4) { animation-delay: .35s; }
+        .document-trail.in-view .document-node:nth-child(5) { animation-delay: .45s; }
+        @keyframes docNodeIn {
+            0% { opacity: 0; transform: translateY(16px) scale(.94); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .document-paper { overflow: hidden; }
+
+        .document-status { transition: background .3s ease, border-color .3s ease, color .3s ease, box-shadow .3s ease, transform .3s ease; }
+        .document-status.pending { animation: statusIdlePulse 2.6s ease-in-out infinite; }
+        @keyframes statusIdlePulse {
+            0%, 100% { box-shadow: 0 0 14px rgba(52,211,153,.22); }
+            50% { box-shadow: 0 0 20px rgba(52,211,153,.5); }
+        }
+
+        /* scanning sweep while a document is actively being verified */
+        .document-node.scanning .document-paper::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 8px;
+            background: linear-gradient(180deg, transparent 0%, rgba(56,189,248,.4) 48%, transparent 100%);
+            animation: docScanSweep .7s ease-in-out;
+        }
+        @keyframes docScanSweep {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+        .document-node.scanning .document-paper {
+            transform: translateY(-6px) rotate(0deg);
+            box-shadow: 0 0 0 2px rgba(56,189,248,.55), 0 18px 35px rgba(56,189,248,.25);
+        }
+        .document-node.scanning .document-status {
+            background: #082f49;
+            border-color: #38bdf8;
+            color: #7dd3fc;
+            box-shadow: 0 0 16px rgba(56,189,248,.65);
+            animation: statusScanWobble .7s ease-in-out infinite;
+        }
+        @keyframes statusScanWobble {
+            0%, 100% { transform: scale(1.15) rotate(-8deg); }
+            50% { transform: scale(1.22) rotate(8deg); }
+        }
+
+        /* verified pop + checkmark badge */
+        .document-node.verified .document-paper {
+            box-shadow: 0 0 0 2px rgba(52,211,153,.45), 0 18px 32px rgba(0,0,0,.32);
+        }
+        .document-node.verified .document-status {
+            transform: scale(1.05);
+        }
+        .document-node.verified .document-paper::after {
+            content: "\2713";
+            position: absolute;
+            left: -6px;
+            top: -8px;
+            width: 20px;
+            height: 20px;
+            border-radius: 999px;
+            background: #052e1a;
+            border: 2px solid #34d399;
+            color: #6ee7b7;
+            font-size: 11px;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 10px rgba(52,211,153,.55);
+            animation: statusPop .45s cubic-bezier(0.175,0.885,0.32,1.275);
+        }
+        @keyframes statusPop {
+            0% { transform: scale(0.4) rotate(-25deg); opacity: 0; }
+            60% { transform: scale(1.25) rotate(8deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        /* click-to-expand verification detail */
+        .document-node .document-detail {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            margin-top: 0;
+            font-size: 9px;
+            line-height: 1.45;
+            color: #7dd3fc;
+            text-align: center;
+            font-weight: 700;
+            letter-spacing: .01em;
+            text-transform: none;
+            transition: max-height .35s ease, opacity .3s ease, margin-top .35s ease;
+        }
+        .document-node.open .document-detail {
+            max-height: 60px;
+            opacity: 1;
+            margin-top: 6px;
+        }
+        .document-node.open .document-paper {
+            transform: translateY(-4px) rotate(0deg) scale(1.03);
+        }
+        .document-node .document-paper { will-change: transform; }
+
+        /* ===== Problem Statement stat reveal ===== */
+        .stat-reveal { opacity: 0; transform: translateY(14px); transition: opacity .6s ease, transform .6s ease; }
+        .stat-reveal.in-view { opacity: 1; transform: translateY(0); }
+
+        /* ===== Architecture / pipeline ===== */
+        .pipeline-flow {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: stretch;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .pipeline-step {
+            flex: 1 1 170px;
+            max-width: 210px;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(51, 65, 85, 0.7);
+            border-radius: 1.25rem;
+            padding: 1.25rem 1rem;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: transform .3s ease, border-color .3s ease;
+        }
+        .pipeline-step:hover { transform: translateY(-4px); border-color: rgba(56,189,248,.4); }
+        .pipeline-icon {
+            width: 46px; height: 46px;
+            border-radius: 0.9rem;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 0.85rem;
+            border: 1px solid;
+        }
+        .pipeline-title { font-size: 0.8rem; font-weight: 800; color: #fff; margin-bottom: 0.4rem; }
+        .pipeline-desc { font-size: 0.68rem; line-height: 1.4; color: #94a3b8; }
+        .pipeline-arrow {
+            display: flex; align-items: center; justify-content: center;
+            color: #475569; flex: 0 0 auto; padding: 0 0.15rem;
+        }
+        @media (max-width: 767px) {
+            .pipeline-flow { flex-direction: column; align-items: stretch; }
+            .pipeline-step { max-width: none; }
+            .pipeline-arrow { transform: rotate(90deg); padding: 0.25rem 0; }
+        }
+
+        .tech-chip {
+            display: flex; align-items: center; gap: 0.5rem;
+            font-size: 0.72rem; font-weight: 700; color: #cbd5e1;
+            background: rgba(15,23,42,.7);
+            border: 1px solid rgba(51,65,85,.7);
+            border-radius: 0.75rem;
+            padding: 0.65rem 0.75rem;
+            justify-content: center;
+            text-align: center;
+            transition: border-color .25s ease, transform .25s ease;
+        }
+        .tech-chip:hover { border-color: rgba(56,189,248,.45); transform: translateY(-2px); }
+
+        /* ===== Impact bars ===== */
+        .impact-bar-track {
+            height: 10px;
+            border-radius: 999px;
+            background: rgba(51,65,85,.5);
+            overflow: hidden;
+        }
+        .impact-bar {
+            height: 100%;
+            border-radius: 999px;
+            transition: width 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* ===== Officer decision buttons ===== */
+        .officer-decision-btn.active-approve { background: rgba(16,185,129,.28); box-shadow: 0 0 0 2px rgba(52,211,153,.55), 0 0 18px rgba(52,211,153,.3); }
+        .officer-decision-btn.active-review { background: rgba(245,158,11,.28); box-shadow: 0 0 0 2px rgba(251,191,36,.55), 0 0 18px rgba(245,158,11,.3); }
+        .officer-decision-btn.active-reject { background: rgba(244,63,94,.28); box-shadow: 0 0 0 2px rgba(251,113,133,.55), 0 0 18px rgba(244,63,94,.3); }
+
+        /* ===== Explainability toggles ===== */
+        .explain-toggle-btn {
+            display: inline-flex; align-items: center; gap: 3px;
+            font-size: 10px; font-weight: 700;
+            color: #64748b;
+            border: 1px solid rgba(100,116,139,.35);
+            border-radius: 999px;
+            padding: 2px 7px;
+            margin-left: 6px;
+            background: rgba(15,23,42,.5);
+            transition: color .2s ease, border-color .2s ease, background .2s ease;
+            cursor: pointer;
+        }
+        .explain-toggle-btn:hover { color: #7dd3fc; border-color: rgba(56,189,248,.5); background: rgba(56,189,248,.08); }
+        .explain-row td {
+            background: rgba(56,189,248,.04);
+            border-left: 2px solid rgba(56,189,248,.5);
+        }
+        .explain-row.hidden { display: none; }
+
+        /* Fraud panel score ring pulse */
+        .fraud-score-glow { animation: statusIdlePulse 2.6s ease-in-out infinite; }
+
+
+        /* ===== BidSeva Light / Dark Mode ===== */
+        :root { color-scheme: dark; }
+        html.light-mode {
+            color-scheme: light;
+            --light-bg: #eef4fa;
+            --light-surface: #ffffff;
+            --light-surface-soft: #f8fbff;
+            --light-border: #cbd5e1;
+            --light-border-strong: #b8c6d6;
+            --light-text: #172033;
+            --light-muted: #526176;
+            --light-blue: #0369a1;
+            --light-indigo: #4f46e5;
+            --light-shadow: 0 12px 32px rgba(15,23,42,.10);
+        }
+
+        /* Solid, clean light canvas */
+        html.light-mode body {
+            background: #eef4fa !important;
+            color: var(--light-text) !important;
+        }
+        html.light-mode #bgImg {
+            filter: brightness(.72) contrast(1.04) saturate(.72) !important;
+        }
+        html.light-mode #bgGradientOverlay {
+            background:
+                linear-gradient(to bottom,
+                    rgba(244,249,255,.93) 0%,
+                    rgba(238,246,253,.91) 48%,
+                    rgba(246,249,252,.96) 100%) !important;
+        }
+        html.light-mode #bgContainer::after {
+            content:"";
+            position:absolute;
+            inset:0;
+            background:rgba(255,255,255,.16);
+            pointer-events:none;
+        }
+        html.light-mode .procurement-grid {
+            opacity:.14;
+            background-image:
+                linear-gradient(rgba(2,105,161,.16) 1px,transparent 1px),
+                linear-gradient(90deg,rgba(2,105,161,.16) 1px,transparent 1px);
+        }
+        html.light-mode .procurement-scan {
+            opacity:.48;
+            filter:saturate(.8);
+        }
+        html.light-mode .verification-orbit {
+            border-color:rgba(2,105,161,.20);
+            box-shadow:0 0 80px rgba(2,105,161,.08), inset 0 0 80px rgba(79,70,229,.04);
+        }
+        html.light-mode .verification-orbit::before { border-color:rgba(79,70,229,.16); }
+        html.light-mode .verification-orbit::after { border-color:rgba(217,119,6,.15); }
+        html.light-mode .verification-badge {
+            background:#ffffff !important;
+            border-color:#b8c6d6 !important;
+            color:#243247 !important;
+            box-shadow:0 8px 24px rgba(15,23,42,.11);
+            backdrop-filter:blur(8px);
+        }
+        html.light-mode .verification-badge span { box-shadow:0 0 7px rgba(5,150,105,.45); }
+
+        /* Make every major surface solid and readable */
+        html.light-mode .glass-card {
+            background:#ffffff !important;
+            border-color:#cbd5e1 !important;
+            box-shadow:var(--light-shadow) !important;
+            backdrop-filter:blur(8px);
+        }
+        html.light-mode header {
+            background:#ffffff !important;
+            border-color:#cbd5e1 !important;
+            box-shadow:0 4px 18px rgba(15,23,42,.08);
+            backdrop-filter:blur(14px);
+        }
+        html.light-mode #appSidebar {
+            background:#ffffff !important;
+            border-color:#cbd5e1 !important;
+            box-shadow:12px 0 35px rgba(15,23,42,.12);
+            backdrop-filter:none;
+        }
+        html.light-mode #sidebarBackdrop { background:rgba(15,23,42,.28) !important; }
+
+        /* Consistent typography */
+        html.light-mode .text-white { color:#172033 !important; }
+        html.light-mode .text-slate-100 { color:#1e293b !important; }
+        html.light-mode .text-slate-200 { color:#334155 !important; }
+        html.light-mode .text-slate-300 { color:#475569 !important; }
+        html.light-mode .text-slate-400 { color:#526176 !important; }
+        html.light-mode .text-slate-500 { color:#64748b !important; }
+        html.light-mode .text-slate-600 { color:#475569 !important; }
+
+        /* Replace dark Tailwind surfaces with actual light surfaces */
+        html.light-mode .bg-slate-950,
+        html.light-mode .bg-slate-950\/80,
+        html.light-mode .bg-slate-950\/90,
+        html.light-mode .bg-slate-900,
+        html.light-mode .bg-slate-900\/60,
+        html.light-mode .bg-slate-900\/90 {
+            background-color:#ffffff !important;
+        }
+        html.light-mode .bg-slate-800,
+        html.light-mode .bg-slate-800\/80,
+        html.light-mode .bg-slate-800\/60 {
+            background-color:#f1f5f9 !important;
+        }
+        html.light-mode .border-slate-800,
+        html.light-mode .border-slate-800\/80,
+        html.light-mode .border-slate-700,
+        html.light-mode .border-slate-600 {
+            border-color:#cbd5e1 !important;
+        }
+
+        /* Navigation and controls */
+        html.light-mode .sidebar-link:hover {
+            background:#e8f3fb !important;
+            color:#0369a1 !important;
+        }
+        html.light-mode .sidebar-link.active {
+            background:#e0f2fe !important;
+            color:#075985 !important;
+            border-color:#bae6fd !important;
+        }
+        html.light-mode .theme-toggle,
+        html.light-mode #bgSwitcherBtn {
+            background:#f8fafc !important;
+            color:#075985 !important;
+            border-color:#93c5fd !important;
+            box-shadow:0 4px 12px rgba(15,23,42,.08);
+        }
+        html.light-mode .theme-toggle:hover,
+        html.light-mode #bgSwitcherBtn:hover {
+            background:#e0f2fe !important;
+        }
+
+        /* Hero badges / chips / status panels */
+        html.light-mode .document-paper {
+            background:linear-gradient(145deg,#ffffff,#f8fafc) !important;
+            border-color:#cbd5e1 !important;
+            box-shadow:0 12px 30px rgba(15,23,42,.12),0 0 0 4px rgba(226,232,240,.75) !important;
+        }
+        html.light-mode .document-label { color:#334155 !important; }
+        html.light-mode .document-detail { color:#0369a1 !important; }
+        html.light-mode .document-trail::before { border-color:#cbd5e1; }
+        html.light-mode .document-status { box-shadow:0 4px 12px rgba(15,23,42,.10); }
+
+        html.light-mode .pipeline-step,
+        html.light-mode .tech-chip {
+            background:#ffffff !important;
+            border-color:#cbd5e1 !important;
+            box-shadow:0 8px 22px rgba(15,23,42,.07);
+        }
+        html.light-mode .pipeline-title { color:#172033 !important; }
+        html.light-mode .pipeline-desc,
+        html.light-mode .tech-chip { color:#475569 !important; }
+        html.light-mode .pipeline-arrow { color:#64748b !important; }
+
+        html.light-mode .impact-bar-track {
+            background:#dbe4ee !important;
+            border:1px solid #cbd5e1;
+        }
+        html.light-mode .explain-toggle-btn {
+            background:#f8fafc !important;
+            color:#475569 !important;
+            border-color:#cbd5e1 !important;
+        }
+        html.light-mode .explain-toggle-btn:hover {
+            background:#e0f2fe !important;
+            color:#0369a1 !important;
+        }
+        html.light-mode .explain-row td {
+            background:#f0f9ff !important;
+            border-left-color:#38bdf8 !important;
+        }
+
+        /* Keep the GeM identity accents crisp in light mode */
+        html.light-mode .gem-logo {
+            box-shadow:0 0 0 2px rgba(2,132,199,.14),0 7px 20px rgba(15,23,42,.14);
+        }
+        html.light-mode .chakra-wheel { color:#2563eb; }
+        html.light-mode .chakra-wheel svg { filter:drop-shadow(0 1px 4px rgba(37,99,235,.22)); }
+
+        /* Theme button */
+        .theme-toggle { position:relative; min-width:92px; }
+        .theme-toggle .theme-icon { transition:transform .35s ease; }
+        .theme-toggle:hover .theme-icon { transform:rotate(18deg) scale(1.08); }
+        @media (max-width:640px){
+            .theme-toggle{min-width:auto;padding:10px!important}
+            .theme-toggle-label{display:none;}
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased selection:bg-sky-500 selection:text-white overflow-x-hidden relative">
+        <div class="tricolor-strip" aria-hidden="true"></div>
+
+    <!-- Dynamic GeM Procurement Background System -->
+    <div id="bgContainer" class="fixed inset-0 z-0 pointer-events-none overflow-hidden transition-transform duration-500 ease-out">
+        <img id="bgImg" 
+             src="https://images.unsplash.com/photo-1605732562742-3023a888e56e?auto=format&fit=crop&w=2400&q=85" 
+             alt="GeM Procurement Verification Background" 
+             class="w-full h-full object-cover object-center filter brightness-[0.48] contrast-[1.08] saturate-[1.05] scale-105 transition-all duration-700 transform">
+        
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] pointer-events-none opacity-20">
+            <div class="w-full h-full border border-sky-500/20 rounded-full flex items-center justify-center">
+                <div class="w-3/4 h-3/4 border border-indigo-500/20 rounded-full flex items-center justify-center">
+                    <div class="w-1/2 h-1/2 border border-amber-500/20 rounded-full"></div>
+                </div>
+            </div>
+            <div class="absolute inset-0 radar-sweep-bg animate-radar-spin"></div>
+        </div>
+
+
+        <div class="procurement-grid"></div>
+        <div class="procurement-scan"></div>
+        <div class="verification-orbit">
+            <div class="orbit-dot"></div>
+        </div>
+
+        <div class="verification-badge b1"><span></span> RFP Scanned</div>
+        <div class="verification-badge b2"><span></span> Vendor Verified</div>
+        <div class="verification-badge b3"><span></span> BOQ Matched</div>
+        <div class="verification-badge b4"><span></span> Compliance Clear</div>
+
+        <div class="document-stream" aria-hidden="true">
+            <i></i><i></i><i></i><i></i><i></i>
+        </div>
+
+        <div id="cursorGlow" class="absolute inset-0 opacity-70 transition-opacity duration-300 pointer-events-none"></div>
+        <canvas id="interactiveBgCanvas" class="absolute inset-0 w-full h-full pointer-events-none opacity-75"></canvas>
+        <div id="bgGradientOverlay" class="absolute inset-0 bg-gradient-to-b from-slate-950/72 via-slate-950/60 to-slate-950/85 transition-colors duration-700"></div>
+        <div class="absolute inset-0 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:32px_32px] opacity-15"></div>
+    </div>
+
+    <!-- Responsive Sidebar Navigation -->
+    <aside id="appSidebar"
+        class="fixed inset-y-0 left-0 z-[70] flex w-68 flex-col border-r border-slate-800/80 bg-slate-950/95 backdrop-blur-2xl shadow-2xl shadow-black/50"
+        aria-label="Primary navigation">
+        <div class="h-24 shrink-0 flex items-center justify-between px-6 py-4 border-b border-slate-800/80">
+            <a href="#top" onclick="closeSidebar()" class="flex items-center gap-4 min-w-0 group">
+                <div class="gem-logo gem-logo-sidebar" aria-label="GeM Bid Procurement Verification">
+                    <span class="gem-logo-ring"></span>
+                    <span class="gem-logo-check">✓</span>
+                    <span class="gem-logo-doc"></span>
+                </div>
+                <div class="min-w-0">
+                    <div class="text-base font-bold tracking-tight text-white truncate flex items-center gap-1.5">
+                        BidSeva
+                    </div>
+                    <div class="text-[10px] uppercase tracking-[0.16em] text-amber-400/90 font-semibold truncate">SIH 2026 • PS #26100</div>
+                </div>
+            </a>
+            <button type="button" onclick="toggleSidebar()" class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition" aria-label="Close navigation">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto px-3 py-5">
+            <p class="px-3 mb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500">Workspace</p>
+            <nav class="space-y-1">
+                <a href="#top" onclick="closeSidebar()" class="sidebar-link active flex items-center gap-3 rounded-xl border border-transparent px-3 py-2.5 text-sm font-medium text-slate-300 hover:bg-slate-900 hover:text-sky-300 transition" data-section="top">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4 shrink-0 text-sky-400"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#problem" onclick="closeSidebar()" class="sidebar-link flex items-center gap-3 rounded-xl border border-transparent px-3 py-2.5 text-sm font-medium text-slate-300 hover:bg-slate-900 hover:text-sky-300 transition" data-section="problem">
+                    <i data-lucide="alert-octagon" class="w-4 h-4 shrink-0 text-rose-400"></i>
+                    <span>Problem Statement</span>
+                </a>
+                <a href="#stages" onclick="closeSidebar()" class="sidebar-link flex items-center gap-3 rounded-xl border border-transparent px-3 py-2.5 text-sm font-medium text-slate-300 hover:bg-slate-900 hover:text-sky-300 transition" data-section="stages">
+                    <i data-lucide="list-ordered" class="w-4 h-4 shrink-0 text-indigo-400"></i>
+                    <span>7 Procurement Stages</span>
+                </a>
+                <a href="#demo" onclick="closeSidebar()" class="sidebar-link flex items-center gap-3 rounded-xl border border-transparent px-3 py-2.5 text-sm font-medium text-slate-300 hover:bg-slate-900 hover:text-sky-300 transition" data-section="demo">
+                    <i data-lucide="scan-search" class="w-4 h-4 shrink-0 text-emerald-400"></i>
+                    <span>Verification Engine</span>
+                </a>
+                <a href="#features" onclick="closeSidebar()" class="sidebar-link flex items-center gap-3 rounded-xl border border-transparent px-3 py-2.5 text-sm font-medium text-slate-300 hover:bg-slate-900 hover:text-sky-300 transition" data-section="features">
+                    <i data-lucide="brain-circuit" class="w-4 h-4 shrink-0 text-purple-400"></i>
+                    <span>AI Features</span>
+                </a>
+                <a href="#architecture" onclick="closeSidebar()" class="sidebar-link flex items-center gap-3 rounded-xl border border-transparent px-3 py-2.5 text-sm font-medium text-slate-300 hover:bg-slate-900 hover:text-sky-300 transition" data-section="architecture">
+                    <i data-lucide="git-branch" class="w-4 h-4 shrink-0 text-sky-400"></i>
+                    <span>Architecture</span>
+                </a>
+                <a href="#impact" onclick="closeSidebar()" class="sidebar-link flex items-center gap-3 rounded-xl border border-transparent px-3 py-2.5 text-sm font-medium text-slate-300 hover:bg-slate-900 hover:text-sky-300 transition" data-section="impact">
+                    <i data-lucide="trending-up" class="w-4 h-4 shrink-0 text-amber-400"></i>
+                    <span>Impact</span>
+                </a>
+            </nav>
+
+            <div class="mt-7 px-3 mb-2 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500">
+                <span class="chakra-wheel w-5 h-5" aria-hidden="true">
+                    <svg viewBox="0 0 40 40" fill="none">
+                        <circle cx="20" cy="20" r="14" stroke="currentColor" stroke-width="1.5"/>
+                        <circle cx="20" cy="20" r="3" stroke="currentColor" stroke-width="1.5"/>
+                        <g stroke="currentColor" stroke-width="1">
+                            <path d="M20 6v11"/><path d="M20 23v11"/>
+                            <path d="M6 20h11"/><path d="M23 20h11"/>
+                            <path d="M10.1 10.1l7.8 7.8"/><path d="M22.1 22.1l7.8 7.8"/>
+                            <path d="M29.9 10.1l-7.8 7.8"/><path d="M17.9 22.1l-7.8 7.8"/>
+                            <path d="M13 7.4l4.8 10.1"/><path d="M22.2 22.5L27 32.6"/>
+                            <path d="M7.4 13l10.1 4.8"/><path d="M22.5 22.2l10.1 4.8"/>
+                            <path d="M27 7.4l-4.8 10.1"/><path d="M17.8 22.5L13 32.6"/>
+                            <path d="M32.6 13l-10.1 4.8"/><path d="M17.5 22.2L7.4 27"/>
+                            <path d="M16.5 6.5l2.1 10.9"/><path d="M21.4 22.6l2.1 10.9"/>
+                            <path d="M33.5 16.5l-10.9 2.1"/><path d="M17.4 21.4L6.5 23.5"/>
+                            <path d="M23.5 6.5l-2.1 10.9"/><path d="M18.6 22.6l-2.1 10.9"/>
+                            <path d="M33.5 23.5l-10.9-2.1"/><path d="M17.4 18.6L6.5 16.5"/>
+                        </g>
+                    </svg>
+                </span>
+                <span>Ministry Authority</span>
+            </div>
+            <div class="space-y-2">
+                <div class="rounded-xl border border-slate-800/80 bg-slate-900/60 p-3">
+                    <div class="flex items-center gap-2 text-xs font-semibold text-slate-200">
+                        <span class="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,.8)]"></span>
+                        MoPNG & GeM Aligned
+                    </div>
+                    <p class="mt-1 text-[11px] leading-relaxed text-slate-400">Conforming to GFR 2017 & GeM GTC / STC Procurement Guidelines.</p>
+                </div>
+                <div class="rounded-xl border border-slate-800/80 bg-slate-900/60 p-3">
+                    <div class="flex items-center gap-2 text-xs font-semibold text-slate-200">
+                        <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-amber-400"></i>
+                        Corrigenda Sync
+                    </div>
+                    <p class="mt-1 text-[11px] leading-relaxed text-slate-400">Continuous tracking of tender addenda across portal releases.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="shrink-0 border-t border-slate-800/80 p-4">
+            <div class="rounded-xl bg-gradient-to-br from-amber-500/10 via-sky-500/10 to-indigo-500/10 border border-amber-500/20 p-3">
+                <div class="flex items-center gap-2 text-xs font-semibold text-amber-300">
+                    <i data-lucide="award" class="w-4 h-4"></i>
+                    SIH 2026 Edition
+                </div>
+                <p class="mt-1 text-[10px] leading-relaxed text-slate-400">Problem Statement 26100 • Smart Automation</p>
+            </div>
+        </div>
+    </aside>
+
+    <div id="sidebarBackdrop" class="fixed inset-0 z-[60] bg-slate-950/70 backdrop-blur-sm" onclick="closeSidebar()"></div>
+
+    <!-- Header / Navigation -->
+    <header class="sticky top-0 z-50 sidebar-offset backdrop-blur-xl bg-slate-950/80 border-b border-slate-800/80 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-24 flex items-center justify-between relative z-10">
+            <div class="flex items-center gap-4">
+                <!-- TOP LEFT MENU BUTTON -->
+                <button type="button" onclick="toggleSidebar()" class="p-2.5 rounded-xl border border-slate-800 bg-slate-900/90 text-slate-300 hover:text-white hover:border-sky-500/50 hover:bg-slate-800 transition shadow-md active:scale-95 flex items-center justify-center cursor-pointer" aria-label="Toggle navigation menu">
+                    <i data-lucide="menu" class="w-5 h-5 text-sky-400"></i>
+                </button>
+                
+                <a href="#top" class="flex items-center gap-4 group cursor-pointer">
+                    <div class="gem-logo gem-logo-header" aria-label="GeM Bid Procurement Verification">
+                        <span class="gem-logo-ring"></span>
+                        <span class="gem-logo-check">✓</span>
+                        <span class="gem-logo-doc"></span>
+                    </div>
+                    <div>
+                        <div class="text-lg font-bold tracking-tight text-white group-hover:text-sky-300 transition-colors flex items-center gap-1.5">
+                            BidSeva
+                        </div>
+                    </div>
+                </a>
+                <div class="hidden xl:flex items-center gap-2.5 pl-4 ml-3 border-l border-slate-800">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/25">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        Live Verification
+                    </span>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-sky-500/10 text-sky-300 border border-sky-500/25">
+                        <i data-lucide="file-check-2" class="w-3 h-3"></i>
+                        Document Intelligence
+                    </span>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/25">
+                        <i data-lucide="shield-check" class="w-3 h-3"></i>
+                        Audit Ready
+                    </span>
+                </div>
+            </div>
+            
+
+
+            <div class="flex items-center gap-3">
+                <div class="relative group hidden sm:block">
+                    <button id="bgSwitcherBtn" onclick="cycleBgTheme()" class="flex items-center gap-1.5 bg-slate-900/90 hover:bg-slate-800 border border-sky-500/30 text-sky-300 text-xs font-semibold px-3 py-2 rounded-lg transition-all shadow-md">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400 animate-pulse"></i>
+                        <span id="bgThemeLabel">GeM Secure Grid</span>
+                    </button>
+                </div>
+
+                <button id="themeToggleBtn" type="button" onclick="toggleTheme()" class="theme-toggle flex items-center justify-center gap-1.5 bg-slate-900/90 hover:bg-slate-800 border border-sky-500/30 text-sky-300 text-xs font-semibold px-3 py-2 rounded-lg transition-all shadow-md" aria-label="Switch to light mode" title="Switch theme">
+                    <i id="themeToggleIcon" data-lucide="sun" class="theme-icon w-3.5 h-3.5 text-amber-400"></i>
+                    <span id="themeToggleLabel" class="theme-toggle-label">Light Mode</span>
+                </button>
+
+                <a href="#demo" class="relative group bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-400 hover:to-indigo-400 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm transition-all duration-300 shadow-lg shadow-sky-500/25 hover:shadow-sky-500/50 flex items-center gap-2 transform hover:-translate-y-0.5 overflow-hidden">
+                    <span class="absolute inset-0 w-full h-full bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></span>
+                    <i data-lucide="shield-check" class="w-4 h-4 text-slate-950"></i>
+                    Verify Tender Bid
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="top" class="relative py-20 sidebar-offset lg:py-28 overflow-hidden z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            
+            <div class="inline-flex flex-wrap items-center justify-center gap-3 px-5 py-3 rounded-2xl bg-slate-900/90 border border-amber-500/40 text-amber-300 text-xs font-semibold tracking-wide mb-10 shadow-xl shadow-amber-950/20 backdrop-blur-md">
+                <span class="inline-flex items-center gap-1.5 bg-amber-500/20 border border-amber-500/40 text-amber-300 px-2 py-0.5 rounded-lg text-[11px] font-bold uppercase tracking-wider">
+                    <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+                    SIH 2026 • PS #26100
+                </span>
+                <span class="text-slate-400 hidden sm:inline">•</span>
+                <span class="text-slate-200 font-medium flex items-center gap-1.5">
+                    <i data-lucide="landmark" class="w-3.5 h-3.5 text-sky-400"></i>
+                    Ministry of Petroleum & Natural Gas (MoPNG) / GeM
+                </span>
+                <span class="text-slate-400 hidden md:inline">•</span>
+                <span class="text-sky-300/90 text-[11px] font-medium hidden md:inline">Smart Automation Category</span>
+                <span class="text-slate-500 hidden lg:inline">•</span>
+                <span class="gem-integrated-badge inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-950/80 border border-sky-500/30 text-sky-200 text-[10px] font-extrabold uppercase tracking-[0.12em]">
+                    <span class="chakra-wheel w-5 h-5" aria-hidden="true">
+                        <svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="14" stroke="currentColor" stroke-width="1.5"/><circle cx="20" cy="20" r="3" stroke="currentColor" stroke-width="1.5"/><g stroke="currentColor" stroke-width="1"><path d="M20 6v11"/><path d="M20 23v11"/><path d="M6 20h11"/><path d="M23 20h11"/><path d="M10.1 10.1l7.8 7.8"/><path d="M22.1 22.1l7.8 7.8"/><path d="M29.9 10.1l-7.8 7.8"/><path d="M17.9 22.1l-7.8 7.8"/><path d="M13 7.4l4.8 10.1"/><path d="M22.2 22.5L27 32.6"/><path d="M7.4 13l10.1 4.8"/><path d="M22.5 22.2l10.1 4.8"/><path d="M27 7.4l-4.8 10.1"/><path d="M17.8 22.5L13 32.6"/><path d="M32.6 13l-10.1 4.8"/><path d="M17.5 22.2L7.4 27"/><path d="M16.5 6.5l2.1 10.9"/><path d="M21.4 22.6l2.1 10.9"/><path d="M33.5 16.5l-10.9 2.1"/><path d="M17.4 21.4L6.5 23.5"/><path d="M23.5 6.5l-2.1 10.9"/><path d="M18.6 22.6l-2.1 10.9"/><path d="M33.5 23.5l-10.9-2.1"/><path d="M17.4 18.6L6.5 16.5"/></g></svg>
+                    </span>
+                    GeM Integrated
+                </span>
+                <span class="text-slate-500 hidden md:inline">•</span>
+                <span class="text-white text-[11px] font-extrabold tracking-wide">GEM/2026/B/8827461</span>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[10px] font-extrabold uppercase tracking-wider">
+                    <i data-lucide="badge-check" class="w-3.5 h-3.5"></i> L1 Bidder Qualified
+                </span>
+                <div class="w-full basis-full h-0"></div>
+                <div class="inline-flex items-center gap-1 rounded-full bg-slate-800/80 border border-slate-700 px-1 py-1 text-[10px] font-bold">
+                    <span class="px-2.5 py-1 rounded-full bg-sky-500 text-slate-950">Goods</span>
+                    <span class="px-2.5 py-1 text-slate-400">Services</span>
+                    <span class="px-2.5 py-1 text-slate-400">Works</span>
+                </div>
+            </div>
+
+            <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white max-w-4xl mx-auto leading-[1.15] mt-2">
+                AI-Powered Integrated <span class="gradient-text">Bid Compliance Verification</span> Platform
+            </h1>
+            <p class="mt-8 text-lg sm:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed font-normal">
+                Purpose-built for <strong class="text-white font-semibold">GeM (Government e-Marketplace)</strong> & PSU procurement. Automates cross-verification of vendor eligibility, MSME exemptions, UDIN certificates, and technical annexures across all 7 procurement stages.
+            </p>
+
+            <div class="mt-12 flex flex-col sm:flex-row gap-5 justify-center">
+                <a href="#demo" class="group bg-gradient-to-r from-sky-500 via-indigo-500 to-amber-500 hover:from-sky-400 hover:to-amber-400 text-slate-950 font-extrabold px-7 py-4 rounded-xl shadow-xl shadow-sky-500/20 hover:shadow-sky-500/40 flex items-center justify-center gap-3 transition-all duration-300 transform hover:-translate-y-1">
+                    <i data-lucide="file-check-2" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+                    Verify GeM Tender Bid
+                </a>
+                <a href="#stages" class="bg-slate-900/80 hover:bg-slate-800 text-slate-200 border border-slate-700/80 hover:border-slate-600 font-semibold px-7 py-4 rounded-xl flex items-center justify-center gap-3 transition-all duration-300 backdrop-blur-md transform hover:-translate-y-1">
+                    <i data-lucide="list-ordered" class="w-5 h-5 text-sky-400"></i>
+                    Explore 7-Stage Process
+                </a>
+            </div>
+
+            <div class="mt-20 grid grid-cols-2 md:grid-cols-4 gap-7 border-t border-slate-800/80 pt-12">
+                <div class="glass-card p-5 rounded-2xl border border-slate-800 hover:border-sky-500/40 group">
+                    <p class="text-3xl font-extrabold text-sky-400 group-hover:scale-105 transition-transform">7 Stages</p>
+                    <p class="text-xs text-slate-400 mt-1">Structured Tender Lifecycle</p>
+                </div>
+                <div class="glass-card p-5 rounded-2xl border border-slate-800 hover:border-indigo-500/40 group">
+                    <p class="text-3xl font-extrabold text-indigo-400 group-hover:scale-105 transition-transform">100%</p>
+                    <p class="text-xs text-slate-400 mt-1">GeM & CPPP Compliance</p>
+                </div>
+                <div class="glass-card p-5 rounded-2xl border border-slate-800 hover:border-emerald-500/40 group">
+                    <p class="text-3xl font-extrabold text-emerald-400 group-hover:scale-105 transition-transform">0%</p>
+                    <p class="text-xs text-slate-400 mt-1">Corrigenda Miss Rate</p>
+                </div>
+                <div class="glass-card p-5 rounded-2xl border border-slate-800 hover:border-amber-500/40 group">
+                    <p class="text-3xl font-extrabold text-amber-400 group-hover:scale-105 transition-transform">10x</p>
+                    <p class="text-xs text-slate-400 mt-1">Faster Bid Evaluation</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem Statement Section -->
+    <section id="problem" class="py-20 sidebar-offset bg-slate-950 border-t border-slate-800/80 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-14">
+                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/25 text-rose-300 text-[10px] font-bold uppercase tracking-wider mb-4">
+                    <i data-lucide="alert-octagon" class="w-3.5 h-3.5"></i> The Problem — SIH 2026 PS #26100
+                </span>
+                <h2 class="text-3xl sm:text-4xl font-bold text-white">Manual Bid Verification Is Slow, Error‑Prone & Exploitable</h2>
+                <p class="text-slate-400 mt-3 max-w-3xl mx-auto">Every GeM tender today is cross-checked by procurement officers reading through hundreds of pages of EMD certificates, Udyam registrations, and technical/financial bids — clause by clause, by hand.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-14">
+                <div class="glass-card p-6 rounded-2xl border border-rose-500/20">
+                    <div class="bg-rose-500/10 border border-rose-500/20 p-3 rounded-xl w-fit text-rose-400 mb-4"><i data-lucide="hourglass" class="w-5 h-5"></i></div>
+                    <h3 class="font-bold text-white mb-2">Delays at Scale</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">GeM handles a very high daily volume of bids across goods, services & works. Manually cross-checking EMD, Udyam and technical annexures for each one takes officers hours per bid, creating evaluation backlogs.</p>
+                </div>
+                <div class="glass-card p-6 rounded-2xl border border-amber-500/20">
+                    <div class="bg-amber-500/10 border border-amber-500/20 p-3 rounded-xl w-fit text-amber-400 mb-4"><i data-lucide="user-x" class="w-5 h-5"></i></div>
+                    <h3 class="font-bold text-white mb-2">Human Error</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">A single missed clause — an expired Udyam certificate, an unsigned affidavit, a mismatched UDIN — causes wrongful technical rejections, or worse, lets a non-compliant bid through evaluation.</p>
+                </div>
+                <div class="glass-card p-6 rounded-2xl border border-purple-500/20">
+                    <div class="bg-purple-500/10 border border-purple-500/20 p-3 rounded-xl w-fit text-purple-400 mb-4"><i data-lucide="shield-off" class="w-5 h-5"></i></div>
+                    <h3 class="font-bold text-white mb-2">Fraud Slips Through</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Duplicate PAN/GSTIN across shell vendors, reused EMD bank-guarantee UTRs, and forged signatures are nearly impossible to catch by eye across thousands of concurrent tenders.</p>
+                </div>
+            </div>
+
+            <div class="animated-border rounded-3xl bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900 border border-slate-800 p-8 sm:p-10 text-center">
+                <p class="text-xs uppercase tracking-[0.2em] text-sky-400 font-bold mb-3">Our Outcome</p>
+                <p class="text-2xl sm:text-3xl font-extrabold text-white leading-snug max-w-3xl mx-auto">BidSeva cuts document verification from <span class="gradient-text">~5 hours to under 3 minutes</span> per bid — while catching fraud patterns no manual reviewer can.</p>
+                <div class="mt-9 grid grid-cols-2 sm:grid-cols-4 gap-6" id="problemStatGrid">
+                    <div class="stat-reveal"><p class="text-2xl font-extrabold text-sky-400">1,684+</p><p class="text-[11px] text-slate-400 mt-1">New Bids Published Daily on GeM*</p></div>
+                    <div class="stat-reveal"><p class="text-2xl font-extrabold text-amber-400">₹1,172 Cr</p><p class="text-[11px] text-slate-400 mt-1">Avg. Daily GMV Transacted on GeM*</p></div>
+                    <div class="stat-reveal"><p class="text-2xl font-extrabold text-emerald-400">25.45L+</p><p class="text-[11px] text-slate-400 mt-1">Registered Sellers Competing for Bids*</p></div>
+                    <div class="stat-reveal"><p class="text-2xl font-extrabold text-rose-400">~700+</p><p class="text-[11px] text-slate-400 mt-1">Buyer/Seller Incidents Logged Daily*</p></div>
+                </div>
+                <p class="text-[10px] text-slate-500 mt-6">*Bid volume, daily GMV and incident-count figures per GeM's own official platform statistics (GeM SPV/PMU presentation, Oct 2025). Seller count per GeM public dashboard, Aug 2026. The ~5 hrs / &lt;3 min verification-time comparison quoted above is our working estimate of manual multi-document review effort per bid, to be validated against real officer timing data during pilot deployment.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7 Stages Section -->
+    <section id="stages" class="py-20 sidebar-offset bg-slate-950/80 border-t border-slate-800/80 relative z-10 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-white">The 7 Stages of Public Procurement in India</h2>
+                <p class="text-slate-400 mt-2 max-w-2xl mx-auto">Understanding how Indian government departments structure tenders from initial requirement to contract execution.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Stage 1 -->
+                <div class="animated-border glass-card p-6 rounded-2xl border border-slate-800 hover:border-sky-500/50 group">
+                    <div class="flex items-center gap-4 mb-4">
+                        <span class="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/30 text-sky-400 font-bold flex items-center justify-center group-hover:bg-sky-500 group-hover:text-slate-950 transition-all duration-300">01</span>
+                        <h3 class="font-bold text-lg text-white">Requirement Identification</h3>
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed">Departments identify operational needs, budget allocations, and project scopes for infrastructure, goods, or services.</p>
+                </div>
+
+                <!-- Stage 2 -->
+                <div class="animated-border glass-card p-6 rounded-2xl border border-slate-800 hover:border-indigo-500/50 group">
+                    <div class="flex items-center gap-4 mb-4">
+                        <span class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 font-bold flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-slate-950 transition-all duration-300">02</span>
+                        <h3 class="font-bold text-lg text-white">Tender Document Prep</h3>
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed">Drafting technical specs, qualification criteria, EMD terms, payment conditions, and NIT (Notice Inviting Tender) details.</p>
+                </div>
+
+                <!-- Stage 3 -->
+                <div class="animated-border glass-card p-6 rounded-2xl border border-slate-800 hover:border-purple-500/50 group">
+                    <div class="flex items-center gap-4 mb-4">
+                        <span class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-400 font-bold flex items-center justify-center group-hover:bg-purple-500 group-hover:text-slate-950 transition-all duration-300">03</span>
+                        <h3 class="font-bold text-lg text-white">Tender Publication</h3>
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed">Official publishing on portals such as CPPP, GeM, state eProcurement portals, and national newspapers.</p>
+                </div>
+
+                <!-- Stage 4 -->
+                <div class="animated-border glass-card p-6 rounded-2xl border border-slate-800 hover:border-amber-500/50 group">
+                    <div class="flex items-center gap-4 mb-4">
+                        <span class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 font-bold flex items-center justify-center group-hover:bg-amber-500 group-hover:text-slate-950 transition-all duration-300">04</span>
+                        <h3 class="font-bold text-lg text-white">Pre-Bid Queries & Corrigenda</h3>
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed">Pre-bid meetings where vendors submit clarifications, leading to official corrigenda or addenda updates.</p>
+                </div>
+
+                <!-- Stage 5 -->
+                <div class="animated-border glass-card p-6 rounded-2xl border border-slate-800 hover:border-emerald-500/50 group">
+                    <div class="flex items-center gap-4 mb-4">
+                        <span class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-slate-950 transition-all duration-300">05</span>
+                        <h3 class="font-bold text-lg text-white">Submission of Bids</h3>
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed">Bidders upload digital signatures, EMD proofs, technical proposals, and financial quotes (BOQs) before deadlines.</p>
+                </div>
+
+                <!-- Stage 6 -->
+                <div class="animated-border glass-card p-6 rounded-2xl border border-slate-800 hover:border-rose-500/50 group">
+                    <div class="flex items-center gap-4 mb-4">
+                        <span class="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 font-bold flex items-center justify-center group-hover:bg-rose-500 group-hover:text-slate-950 transition-all duration-300">06</span>
+                        <h3 class="font-bold text-lg text-white">Evaluation & Comparison</h3>
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed">Two-cover evaluation: Technical bid verification followed by financial opening to identify the lowest valid L1 bidder.</p>
+                </div>
+            </div>
+
+            <!-- Stage 7 Dynamic Banner -->
+            <div class="mt-8 bg-gradient-to-r from-sky-900/30 via-indigo-900/30 to-purple-900/30 border border-sky-500/30 p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 backdrop-blur-xl relative overflow-hidden group">
+                <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-sky-500/10 rounded-full blur-2xl group-hover:bg-sky-500/20 transition-all"></div>
+                <div class="flex items-center gap-4 relative z-10">
+                    <span class="w-12 h-12 rounded-xl bg-sky-500 text-slate-950 font-extrabold text-lg flex items-center justify-center shrink-0 shadow-lg shadow-sky-500/30 group-hover:scale-110 transition-transform">07</span>
+                    <div>
+                        <h3 class="text-xl font-bold text-white">Stage 7: Award of Contract (LoA)</h3>
+                        <p class="text-slate-300 text-sm mt-1">Issuance of Letter of Award (LoA), submission of Performance Bank Guarantee (PBG), and official contract execution.</p>
+                    </div>
+                </div>
+                <a href="#demo" class="whitespace-nowrap bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold px-6 py-3 rounded-xl transition-all duration-300 shadow-lg shadow-sky-500/20 hover:shadow-sky-500/40 relative z-10">
+                    Verify Final Documents
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Verification Demo Section -->
+    <section id="demo" class="py-16 sidebar-offset bg-slate-900/60 border-y border-slate-800/80 relative z-10 backdrop-blur-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-10">
+                <h2 class="text-2xl sm:text-3xl font-bold text-white">Live Verification & Dynamic Fee Engine</h2>
+                <p class="text-slate-400 text-sm mt-2">Upload Tender RFP and Vendor documents to dynamically analyze Tender Fee and EMD status in real time.</p>
+            </div>
+
+            <!-- GeM Bid Reference Bar -->
+            <div class="mb-5 rounded-2xl border border-sky-500/25 bg-slate-950/80 backdrop-blur-xl shadow-xl overflow-hidden">
+                <div class="h-1 bg-gradient-to-r from-[#ff9933] via-white to-[#138808]"></div>
+                <div class="px-5 py-3 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <span class="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.16em] font-extrabold text-slate-400">
+                            <span class="chakra-wheel w-6 h-6"><svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="14" stroke="currentColor" stroke-width="1.5"/><circle cx="20" cy="20" r="3" stroke="currentColor" stroke-width="1.5"/><g stroke="currentColor" stroke-width="1"><path d="M20 6v11"/><path d="M20 23v11"/><path d="M6 20h11"/><path d="M23 20h11"/><path d="M10.1 10.1l7.8 7.8"/><path d="M22.1 22.1l7.8 7.8"/><path d="M29.9 10.1l-7.8 7.8"/><path d="M17.9 22.1l-7.8 7.8"/><path d="M13 7.4l4.8 10.1"/><path d="M22.2 22.5L27 32.6"/><path d="M7.4 13l10.1 4.8"/><path d="M22.5 22.2l10.1 4.8"/><path d="M27 7.4l-4.8 10.1"/><path d="M17.8 22.5L13 32.6"/><path d="M32.6 13l-10.1 4.8"/><path d="M17.5 22.2L7.4 27"/><path d="M16.5 6.5l2.1 10.9"/><path d="M21.4 22.6l2.1 10.9"/><path d="M33.5 16.5l-10.9 2.1"/><path d="M17.4 21.4L6.5 23.5"/><path d="M23.5 6.5l-2.1 10.9"/><path d="M18.6 22.6l-2.1 10.9"/><path d="M33.5 23.5l-10.9-2.1"/><path d="M17.4 18.6L6.5 16.5"/></g></svg></span>
+                            Bid Reference Bar
+                        </span>
+                        <span class="font-mono font-extrabold text-sky-300 text-sm">GEM/2026/B/8827461</span>
+                        <span class="px-2.5 py-1 rounded-full bg-sky-500/10 border border-sky-500/25 text-sky-300 text-[10px] font-bold">Goods</span>
+                        <span class="px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-300 text-[10px] font-bold">L1 Evaluation: Rank 1 of 4 Bidders</span>
+                    </div>
+                    <span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-emerald-300"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Verification Session Active</span>
+                </div>
+            </div>
+
+            <!-- Five-step document verification trail -->
+            <div class="mb-8 rounded-3xl border border-slate-800/80 bg-slate-950/70 p-5 sm:p-7 backdrop-blur-xl">
+                <div class="flex items-center justify-between gap-3 mb-6">
+                    <div>
+                        <h3 class="text-sm font-extrabold text-white flex items-center gap-2"><i data-lucide="files" class="w-4 h-4 text-sky-400"></i> Document Verification Trail</h3>
+                        <p class="text-[11px] text-slate-500 mt-1">Sequential verification of key tender submission and evaluation documents.</p>
+                    </div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-300 border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 rounded-full">5 / 5 Tracked</span>
+                </div>
+                <div class="document-trail" id="docVerificationTrail">
+                    <div class="document-progress" id="docTrailProgress"></div>
+                    <div class="document-node">
+                        <div class="document-paper">
+                            <span class="document-status pending"><i data-lucide="receipt" class="w-3.5 h-3.5"></i></span>
+                            <div class="text-[10px] font-black text-slate-700">TENDER FEE</div>
+                            <span class="paper-line mid"></span><span class="paper-line short"></span><span class="paper-line"></span><span class="paper-line mid"></span>
+                        </div>
+                        <div class="document-label">Tender Fee</div>
+                        <div class="document-detail">Payment gateway ref auto‑matched to bid ledger</div>
+                    </div>
+                    <div class="document-node">
+                        <div class="document-paper">
+                            <span class="document-status pending"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i></span>
+                            <div class="text-[10px] font-black text-slate-700">EMD / UDYAM</div>
+                            <span class="paper-line"></span><span class="paper-line mid"></span><span class="paper-line short"></span><span class="paper-line"></span>
+                        </div>
+                        <div class="document-label">EMD / Udyam</div>
+                        <div class="document-detail">Bank guarantee / Udyam cert cross‑verified</div>
+                    </div>
+                    <div class="document-node">
+                        <div class="document-paper">
+                            <span class="document-status pending"><i data-lucide="file-check-2" class="w-3.5 h-3.5"></i></span>
+                            <div class="text-[10px] font-black text-slate-700">TECHNICAL BID</div>
+                            <span class="paper-line short"></span><span class="paper-line mid"></span><span class="paper-line"></span><span class="paper-line mid"></span>
+                        </div>
+                        <div class="document-label">Technical Bid</div>
+                        <div class="document-detail">Spec compliance mapped to RFP clauses</div>
+                    </div>
+                    <div class="document-node">
+                        <div class="document-paper">
+                            <span class="document-status pending"><i data-lucide="clipboard-check" class="w-3.5 h-3.5"></i></span>
+                            <div class="text-[10px] font-black text-slate-700">ELIGIBILITY</div>
+                            <span class="paper-line mid"></span><span class="paper-line short"></span><span class="paper-line"></span><span class="paper-line mid"></span>
+                        </div>
+                        <div class="document-label">Eligibility & Qualification</div>
+                        <div class="document-detail">Turnover & experience certificates authenticated</div>
+                    </div>
+                    <div class="document-node">
+                        <div class="document-paper">
+                            <span class="document-status pending"><i data-lucide="calculator" class="w-3.5 h-3.5"></i></span>
+                            <div class="text-[10px] font-black text-slate-700">FINANCIAL BID</div>
+                            <span class="paper-line mid"></span><span class="paper-line"></span><span class="paper-line short"></span><span class="paper-line"></span>
+                        </div>
+                        <div class="document-label">Financial Bid</div>
+                        <div class="document-detail">Price schedule reconciled, no arithmetic errors</div>
+                    </div>
+                </div>
+                <p class="text-[10px] text-slate-500 mt-4 text-center italic">Tap any document to view its verification note · Run the AI verification below to watch the trail scan live</p>
+            </div>
+
+            <div class="bg-slate-950/80 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden backdrop-blur-2xl">
+                <div id="scannerOverlay" class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-sky-400 to-transparent shadow-[0_0_15px_#38bdf8] hidden z-20"></div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="border-2 border-dashed border-slate-700/80 hover:border-sky-500/60 bg-slate-900/40 p-6 rounded-2xl flex flex-col items-center justify-center text-center transition-all duration-300 relative group hover:bg-slate-900/70">
+                        <div class="p-3 bg-sky-500/10 rounded-2xl text-sky-400 mb-3 group-hover:scale-110 transition-transform">
+                            <i data-lucide="file-text" class="w-8 h-8"></i>
+                        </div>
+                        <h4 class="font-semibold text-slate-200">1. Select GeM Tender RFP Document</h4>
+                        <p class="text-xs text-slate-400 mt-1">Browse and upload official CPPP / GeM Tender RFP (PDF/Docx)</p>
+                        
+                        <div class="mt-4 flex flex-col items-center gap-2">
+                            <label for="rfpFileInput" class="cursor-pointer bg-slate-800 hover:bg-sky-500 hover:text-slate-950 text-sky-300 text-xs font-semibold px-4 py-2.5 rounded-xl border border-slate-700 transition-all duration-200 flex items-center gap-2 shadow-lg">
+                                <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                                Browse Document
+                            </label>
+                            <input type="file" id="rfpFileInput" class="hidden" onchange="handleRfpFileSelect(this)">
+                            <span id="rfpFileName" class="text-xs bg-slate-800/80 text-sky-300 px-3 py-1 rounded-full border border-slate-700/80 max-w-xs truncate shadow-inner">GeM-Tender-2026-Railways.pdf</span>
+                        </div>
+                    </div>
+
+                    <div class="border-2 border-dashed border-slate-700/80 hover:border-indigo-500/60 bg-slate-900/40 p-6 rounded-2xl flex flex-col items-center justify-center text-center transition-all duration-300 relative group hover:bg-slate-900/70">
+                        <div class="p-3 bg-indigo-500/10 rounded-2xl text-indigo-400 mb-3 group-hover:scale-110 transition-transform">
+                            <i data-lucide="file-spread-sheet" class="w-8 h-8"></i>
+                        </div>
+                        <h4 class="font-semibold text-slate-200">2. Select Vendor Submission Document</h4>
+                        <p class="text-xs text-slate-400 mt-1">Browse and upload technical & financial proposal (ZIP/PDF)</p>
+                        
+                        <div class="mt-4 flex flex-col items-center gap-2">
+                            <label for="vendorFileInput" class="cursor-pointer bg-slate-800 hover:bg-indigo-500 hover:text-slate-950 text-indigo-300 text-xs font-semibold px-4 py-2.5 rounded-xl border border-slate-700 transition-all duration-200 flex items-center gap-2 shadow-lg">
+                                <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                                Browse Document
+                            </label>
+                            <input type="file" id="vendorFileInput" class="hidden" onchange="handleVendorFileSelect(this)">
+                            <span id="vendorFileName" class="text-xs bg-slate-800/80 text-indigo-300 px-3 py-1 rounded-full border border-slate-700/80 max-w-xs truncate shadow-inner">Vendor-Submission-Pack.zip</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mb-8">
+                    <button id="runAiBtn" onclick="runAiVerification()" class="relative group bg-gradient-to-r from-sky-500 via-indigo-500 to-amber-500 hover:from-sky-400 hover:to-amber-400 text-slate-950 font-extrabold px-8 py-3.5 rounded-xl transition-all duration-300 shadow-lg shadow-sky-500/25 hover:shadow-sky-500/45 flex items-center gap-2.5 mx-auto transform hover:scale-105 active:scale-95">
+                        <i data-lucide="cpu" class="w-5 h-5 text-slate-950 group-hover:rotate-12 transition-transform"></i>
+                        Run Dynamic AI Verification
+                    </button>
+                </div>
+
+                <div id="loadingState" class="hidden my-8 text-center py-8 bg-slate-900/30 rounded-2xl border border-slate-800 animate-pulse">
+                    <div class="relative inline-block">
+                        <div class="rounded-full h-12 w-12 border-4 border-sky-500/20 border-t-sky-400 animate-spin mx-auto mb-4"></div>
+                        <i data-lucide="sparkles" class="w-5 h-5 text-sky-400 absolute top-3 left-3 animate-ping"></i>
+                    </div>
+                    <p class="text-slate-200 font-semibold text-sm">Dynamically calculating EMD & Tender Fee parameters...</p>
+                    <p class="text-xs text-slate-400 mt-1">Analyzing financial clauses, exemption proofs, and BOQ values</p>
+                </div>
+
+                <div id="resultsDashboard" class="space-y-6 transition-all duration-500">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-800/80 pb-3">
+                        <i data-lucide="list-checks" class="w-5 h-5 text-sky-400"></i>
+                        Compliance Status Overview
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div id="cardTenderFee" class="glass-card border border-slate-800 p-4 rounded-2xl relative overflow-hidden group">
+                            <span class="text-xs text-slate-400 font-medium block">1. Tender Fee</span>
+                            <div class="flex items-baseline justify-between mt-2">
+                                <span id="tenderFeeStatus" class="text-2xl font-extrabold text-emerald-400">Paid</span>
+                                <span id="tenderFeeBadge" class="text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/30 font-semibold shadow-sm">₹10,000 Verified</span>
+                            </div>
+                            <p id="tenderFeeDetail" class="text-xs text-slate-400 mt-2.5 leading-relaxed">Transaction UTR #992817263 verified via SBI e-Procurement Portal.</p>
+                        </div>
+
+                        <div id="cardEMD" class="glass-card border border-slate-800 p-4 rounded-2xl relative overflow-hidden group">
+                            <span class="text-xs text-slate-400 font-medium block">2. EMD Status</span>
+                            <div class="flex items-baseline justify-between mt-2">
+                                <span id="emdStatusText" class="text-2xl font-extrabold text-sky-400">Exempted</span>
+                                <span id="emdBadge" class="text-xs text-sky-400 bg-sky-500/10 px-2.5 py-1 rounded-md border border-sky-500/30 font-semibold shadow-sm">Udyam Verified</span>
+                            </div>
+                            <p id="emdDetail" class="text-xs text-slate-400 mt-2.5 leading-relaxed">MSME Registration active; exemption granted as per Public Procurement Policy.</p>
+                        </div>
+
+                        <div class="glass-card border border-slate-800 p-4 rounded-2xl relative overflow-hidden group">
+                            <span class="text-xs text-slate-400 font-medium block">3. Technical Bid</span>
+                            <div class="flex items-baseline justify-between mt-2">
+                                <span class="text-2xl font-extrabold text-amber-400">92% Score</span>
+                                <span class="text-xs text-rose-400 bg-rose-500/10 px-2.5 py-1 rounded-md border border-rose-500/30 font-semibold shadow-sm">1 Action Item</span>
+                            </div>
+                            <p class="text-xs text-slate-400 mt-2.5 leading-relaxed">ISO specs met; CA financial turnover sheet missing valid UDIN number.</p>
+                        </div>
+
+                        <div class="glass-card border border-slate-800 p-4 rounded-2xl relative overflow-hidden group">
+                            <span class="text-xs text-slate-400 font-medium block">4. Financial Bid</span>
+                            <div class="flex items-baseline justify-between mt-2">
+                                <span class="text-2xl font-extrabold text-indigo-400">Compliant</span>
+                                <span class="text-xs text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-md border border-indigo-500/30 font-semibold shadow-sm">BOQ Matched</span>
+                            </div>
+                            <p class="text-xs text-slate-400 mt-2.5 leading-relaxed">Commercial price breakdown is strictly within specified RFP financial caps.</p>
+                        </div>
+                    </div>
+
+                    <div class="glass-card border border-slate-800/80 rounded-2xl overflow-hidden mt-6">
+                        <div class="px-6 py-4 border-b border-slate-800/80 flex justify-between items-center bg-slate-900/30">
+                            <h4 class="font-bold text-slate-200 text-sm flex items-center gap-2">
+                                <i data-lucide="shield" class="w-4 h-4 text-sky-400"></i>
+                                Detailed Stage Audit Matrix & RFP Checklist
+                            </h4>
+                            <button id="downloadAuditReportBtn" type="button" onclick="downloadAuditReport()" class="text-xs bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700/80 px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 shadow-sm hover:scale-105 active:scale-95">
+                                <i data-lucide="download" class="w-3.5 h-3.5"></i> Download Audit Report
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs sm:text-sm">
+                                <thead class="bg-slate-950/80 text-slate-400 border-b border-slate-800/80">
+                                    <tr>
+                                        <th class="p-4 font-semibold">RFP Checklist Item</th>
+                                        <th class="p-4 font-semibold">Submitted Vendor Verification Details</th>
+                                        <th class="p-4 font-semibold">AI Audit Result</th>
+                                        <th class="p-4 font-semibold">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800/50 text-slate-300">
+                                    <tr class="hover:bg-slate-800/30 transition-colors">
+                                        <td class="p-4 font-medium text-white">1. Tender Fee Payment</td>
+                                        <td class="p-4 text-xs text-slate-400" id="matrixTenderDetail">RTGS Receipt #REC-88390 submitted and verified via portal.</td>
+                                        <td class="p-4" id="matrixTenderResult">
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                                <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Verified
+                                            </span>
+                                        </td>
+                                        <td class="p-4 text-xs font-semibold text-emerald-400" id="matrixTenderStatus">Cleared</td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-800/30 transition-colors">
+                                        <td class="p-4 font-medium text-white">2. EMD / MSME Exemption Proof</td>
+                                        <td class="p-4 text-xs text-slate-400" id="matrixEmdDetail">Udyam Certificate #UDYAM-KR-03-00281 active & validated.</td>
+                                        <td class="p-4" id="matrixEmdResult">
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                                                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Exempted
+                                            </span>
+                                        </td>
+                                        <td class="p-4 text-xs font-semibold text-sky-400" id="matrixEmdStatus">Cleared</td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-800/30 transition-colors">
+                                        <td class="p-4 font-medium text-white">3. Technical Specifications Compliance</td>
+                                        <td class="p-4 text-xs text-slate-400">ISO 9001/27001 certifications & technical datasheet submitted.</td>
+                                        <td class="p-4">
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                                <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Specs Matched
+                                            </span>
+                                        </td>
+                                        <td class="p-4 text-xs font-semibold text-emerald-400">Cleared</td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-800/30 bg-rose-500/5 transition-colors">
+                                        <td class="p-4 font-medium text-white">4. CA Turnover Sheet & UDIN Verification</td>
+                                        <td class="p-4 text-xs text-slate-400">Financial turnover sheet attached, but missing valid UDIN stamp.</td>
+                                        <td class="p-4">
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                                                <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> Missing UDIN
+                                            </span>
+                                            <button type="button" class="explain-toggle-btn" data-target="explainRow4" onclick="toggleExplain(this)"><i data-lucide="chevron-down" class="w-3 h-3"></i> Why flagged?</button>
+                                        </td>
+                                        <td class="p-4 text-xs font-semibold text-amber-400">Pending</td>
+                                    </tr>
+                                    <tr id="explainRow4" class="explain-row hidden">
+                                        <td colspan="4" class="p-4 text-xs text-slate-400 leading-relaxed">
+                                            <strong class="text-sky-300">RFP Clause 6.3(b) — Financial Eligibility:</strong> Annual turnover certificates above ₹50 lakh must carry a valid UDIN (Unique Document Identification Number) issued via the ICAI UDIN portal.<br>
+                                            <strong class="text-slate-300">Field checked:</strong> CA membership number + UDIN watermark on page 2 of the turnover sheet.<br>
+                                            <strong class="text-rose-300">Result:</strong> CA signature is present, but no UDIN watermark was detected — the field could not be cross-verified against the ICAI registry.
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-800/30 transition-colors">
+                                        <td class="p-4 font-medium text-white">5. Financial BOQ Price Breakdown</td>
+                                        <td class="p-4 text-xs text-slate-400">Itemized Financial BOQ xls uploaded; price quotes within budget caps.</td>
+                                        <td class="p-4">
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                                <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> BOQ Validated
+                                            </span>
+                                        </td>
+                                        <td class="p-4 text-xs font-semibold text-emerald-400">Cleared</td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-800/30 transition-colors">
+                                        <td class="p-4 font-medium text-white">6. Non-Blacklisting Self-Declaration</td>
+                                        <td class="p-4 text-xs text-slate-400">Notarized affidavit on ₹100 stamp paper submitted as required.</td>
+                                        <td class="p-4">
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                                <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Affidavit Verified
+                                            </span>
+                                        </td>
+                                        <td class="p-4 text-xs font-semibold text-emerald-400">Cleared</td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-800/30 bg-amber-500/5 transition-colors">
+                                        <td class="p-4 font-medium text-white">7. Power of Attorney & DSC Signatures</td>
+                                        <td class="p-4 text-xs text-slate-400">Board resolution attached; Class-3 DSC signature re-verification pending.</td>
+                                        <td class="p-4">
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                                <i data-lucide="clock" class="w-3.5 h-3.5"></i> DSC Audit Pending
+                                            </span>
+                                            <button type="button" class="explain-toggle-btn" data-target="explainRow7" onclick="toggleExplain(this)"><i data-lucide="chevron-down" class="w-3 h-3"></i> Why flagged?</button>
+                                        </td>
+                                        <td class="p-4 text-xs font-semibold text-amber-400">Pending</td>
+                                    </tr>
+                                    <tr id="explainRow7" class="explain-row hidden">
+                                        <td colspan="4" class="p-4 text-xs text-slate-400 leading-relaxed">
+                                            <strong class="text-sky-300">RFP Clause 9.1 — Authorization:</strong> All bid documents must be digitally signed using a valid Class‑3 Digital Signature Certificate (DSC) matching the authorized signatory named in the Power of Attorney.<br>
+                                            <strong class="text-slate-300">Field checked:</strong> DSC certificate serial number vs. PoA signatory name.<br>
+                                            <strong class="text-amber-300">Result:</strong> DSC hash is present, but the certificate's validity window could not be confirmed against the CCA (Controller of Certifying Authorities) registry in this session — flagged for manual re-verification.
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-emerald-500/5 bg-emerald-500/5 transition-colors">
+                                        <td class="p-4 font-medium text-white">8. L1 Bidder Determination</td>
+                                        <td class="p-4 text-xs text-slate-400">Financial comparison completed across 4 responsive bidders for GEM/2026/B/8827461.</td>
+                                        <td class="p-4">
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                                <i data-lucide="trophy" class="w-3.5 h-3.5"></i> Rank 1 of 4
+                                            </span>
+                                        </td>
+                                        <td class="p-4 text-xs font-semibold text-emerald-400">L1 Qualified</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Fraud & Anomaly Risk Panel -->
+                    <div class="glass-card border border-slate-800/80 rounded-2xl overflow-hidden mt-6">
+                        <div class="px-6 py-4 border-b border-slate-800/80 flex flex-wrap justify-between items-center gap-3 bg-slate-900/30">
+                            <h4 class="font-bold text-slate-200 text-sm flex items-center gap-2">
+                                <i data-lucide="shield-alert" class="w-4 h-4 text-rose-400"></i>
+                                Fraud & Anomaly Risk Panel
+                            </h4>
+                            <span id="fraudRiskBadge" class="fraud-score-glow inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-bold">
+                                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Low Risk · Score 8 / 100
+                            </span>
+                        </div>
+                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="flex items-center gap-4 p-4 rounded-xl border border-slate-800 bg-slate-900/40">
+                                <div class="shrink-0 p-2.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><i data-lucide="fingerprint" class="w-5 h-5"></i></div>
+                                <div class="min-w-0">
+                                    <p class="text-sm font-semibold text-white">Duplicate PAN / GSTIN Check</p>
+                                    <p class="text-xs text-slate-400 mt-0.5">No match found against other active GeM tender submissions.</p>
+                                </div>
+                                <span class="ml-auto shrink-0 text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-2 py-1 rounded-full">Clear</span>
+                            </div>
+                            <div class="flex items-center gap-4 p-4 rounded-xl border border-slate-800 bg-slate-900/40">
+                                <div class="shrink-0 p-2.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><i data-lucide="signature" class="w-5 h-5"></i></div>
+                                <div class="min-w-0">
+                                    <p class="text-sm font-semibold text-white">Signature / Stamp Forensics</p>
+                                    <p class="text-xs text-slate-400 mt-0.5">DSC signature hash matches the registered Class‑3 certificate.</p>
+                                </div>
+                                <span class="ml-auto shrink-0 text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-2 py-1 rounded-full">Clear</span>
+                            </div>
+                            <div class="flex items-center gap-4 p-4 rounded-xl border border-amber-500/25 bg-amber-500/5">
+                                <div class="shrink-0 p-2.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20"><i data-lucide="repeat" class="w-5 h-5"></i></div>
+                                <div class="min-w-0">
+                                    <p class="text-sm font-semibold text-white">EMD Bank Guarantee UTR Reuse</p>
+                                    <p class="text-xs text-slate-400 mt-0.5">UTR #99281**** also appears on 1 other closed tender — flagged for manual recheck.</p>
+                                </div>
+                                <span class="ml-auto shrink-0 text-[10px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/25 px-2 py-1 rounded-full">Review</span>
+                            </div>
+                            <div class="flex items-center gap-4 p-4 rounded-xl border border-slate-800 bg-slate-900/40">
+                                <div class="shrink-0 p-2.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><i data-lucide="file-warning" class="w-5 h-5"></i></div>
+                                <div class="min-w-0">
+                                    <p class="text-sm font-semibold text-white">Document Metadata Integrity</p>
+                                    <p class="text-xs text-slate-400 mt-0.5">No post-signing edits detected in PDF creation/modification timestamps.</p>
+                                </div>
+                                <span class="ml-auto shrink-0 text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-2 py-1 rounded-full">Clear</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Multi-Bidder Comparison / L1 Determination -->
+                    <div class="glass-card border border-slate-800/80 rounded-2xl overflow-hidden mt-6">
+                        <div class="px-6 py-4 border-b border-slate-800/80 flex justify-between items-center bg-slate-900/30">
+                            <h4 class="font-bold text-slate-200 text-sm flex items-center gap-2">
+                                <i data-lucide="trophy" class="w-4 h-4 text-amber-400"></i>
+                                L1 Determination — All 4 Bidders Compared
+                            </h4>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-amber-300 border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 rounded-full">Auto-Ranked</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs sm:text-sm">
+                                <thead class="bg-slate-950/80 text-slate-400 border-b border-slate-800/80">
+                                    <tr>
+                                        <th class="p-4 font-semibold">Rank</th>
+                                        <th class="p-4 font-semibold">Bidder</th>
+                                        <th class="p-4 font-semibold">Quoted Price (₹)</th>
+                                        <th class="p-4 font-semibold">Compliance %</th>
+                                        <th class="p-4 font-semibold">Risk Flags</th>
+                                        <th class="p-4 font-semibold">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800/50 text-slate-300">
+                                    <tr class="bg-emerald-500/5 hover:bg-emerald-500/10 transition-colors">
+                                        <td class="p-4 font-extrabold text-emerald-400">#1</td>
+                                        <td class="p-4 font-medium text-white">Krishna Rail Components Pvt. Ltd. <span class="text-[10px] text-slate-500">(current vendor)</span></td>
+                                        <td class="p-4 font-mono">42,18,500</td>
+                                        <td class="p-4"><span class="font-semibold text-emerald-400">92%</span></td>
+                                        <td class="p-4"><span class="text-[10px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/25 px-2 py-1 rounded-full">1 Review</span></td>
+                                        <td class="p-4"><span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><i data-lucide="trophy" class="w-3.5 h-3.5"></i> L1 Qualified</span></td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-800/30 transition-colors">
+                                        <td class="p-4 font-bold text-slate-400">#2</td>
+                                        <td class="p-4 font-medium text-slate-200">Bharat Signal & Track Systems</td>
+                                        <td class="p-4 font-mono">43,90,200</td>
+                                        <td class="p-4"><span class="font-semibold text-slate-300">88%</span></td>
+                                        <td class="p-4"><span class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-2 py-1 rounded-full">None</span></td>
+                                        <td class="p-4 text-xs font-semibold text-slate-400">Responsive</td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-800/30 transition-colors">
+                                        <td class="p-4 font-bold text-slate-400">#3</td>
+                                        <td class="p-4 font-medium text-slate-200">Vindhya Infra Engineering Co.</td>
+                                        <td class="p-4 font-mono">45,02,750</td>
+                                        <td class="p-4"><span class="font-semibold text-slate-300">81%</span></td>
+                                        <td class="p-4"><span class="text-[10px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/25 px-2 py-1 rounded-full">2 Review</span></td>
+                                        <td class="p-4 text-xs font-semibold text-slate-400">Responsive</td>
+                                    </tr>
+                                    <tr class="hover:bg-rose-500/5 bg-rose-500/5 transition-colors">
+                                        <td class="p-4 font-bold text-slate-500">#4</td>
+                                        <td class="p-4 font-medium text-slate-400">Shakti Traders & Supply</td>
+                                        <td class="p-4 font-mono text-slate-500">41,75,000</td>
+                                        <td class="p-4"><span class="font-semibold text-rose-400">54%</span></td>
+                                        <td class="p-4"><span class="text-[10px] font-bold text-rose-400 bg-rose-500/10 border border-rose-500/25 px-2 py-1 rounded-full">Duplicate GSTIN</span></td>
+                                        <td class="p-4"><span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20"><i data-lucide="x-circle" class="w-3.5 h-3.5"></i> Disqualified</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="text-[10px] text-slate-500 px-6 py-3 border-t border-slate-800/80">Lowest price alone doesn't win — Bidder #4 quoted the lowest but was disqualified after the fraud engine flagged a GSTIN also used by an unrelated vendor on a separate tender. Rank is computed only across bids that pass compliance & fraud screening.</p>
+                    </div>
+
+                    <!-- Officer-in-the-Loop Decision Panel -->
+                    <div class="glass-card border border-sky-500/20 rounded-2xl overflow-hidden mt-6">
+                        <div class="px-6 py-4 border-b border-slate-800/80 flex items-center gap-2 bg-slate-900/30">
+                            <i data-lucide="user-check" class="w-4 h-4 text-sky-400"></i>
+                            <h4 class="font-bold text-slate-200 text-sm">Procurement Officer Decision — Human-in-the-Loop</h4>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-xs text-slate-400 mb-5">BidSeva recommends an outcome but never finalizes it — every award decision requires sign-off from the designated procurement officer, with a full audit trail of who approved what and why.</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+                                <button type="button" onclick="setOfficerDecision('approve')" id="decisionApproveBtn" class="officer-decision-btn flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 font-semibold text-sm hover:bg-emerald-500/20 transition">
+                                    <i data-lucide="check-circle-2" class="w-4 h-4"></i> Approve for Award
+                                </button>
+                                <button type="button" onclick="setOfficerDecision('review')" id="decisionReviewBtn" class="officer-decision-btn flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-300 font-semibold text-sm hover:bg-amber-500/20 transition">
+                                    <i data-lucide="flag" class="w-4 h-4"></i> Flag for Review
+                                </button>
+                                <button type="button" onclick="setOfficerDecision('reject')" id="decisionRejectBtn" class="officer-decision-btn flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-300 font-semibold text-sm hover:bg-rose-500/20 transition">
+                                    <i data-lucide="x-circle" class="w-4 h-4"></i> Reject Bid
+                                </button>
+                            </div>
+                            <div id="officerDecisionAck" class="hidden text-xs font-semibold rounded-xl px-4 py-3 border mb-5"></div>
+                            <div>
+                                <label for="vendorQueryBox" class="text-xs font-semibold text-slate-300 flex items-center gap-1.5 mb-2"><i data-lucide="message-circle-question" class="w-3.5 h-3.5 text-sky-400"></i> Raise a Query to Vendor (optional)</label>
+                                <textarea id="vendorQueryBox" rows="2" placeholder="e.g. Please submit a valid UDIN-stamped turnover certificate within 3 working days." class="w-full text-xs bg-slate-900/60 border border-slate-700/80 rounded-xl p-3 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-sky-500/60 resize-none"></textarea>
+                                <button type="button" onclick="sendVendorQuery()" class="mt-3 text-xs font-semibold bg-slate-800 hover:bg-sky-500 hover:text-slate-950 text-sky-300 px-4 py-2 rounded-xl border border-slate-700 transition flex items-center gap-2">
+                                    <i data-lucide="send" class="w-3.5 h-3.5"></i> Send Query to Vendor
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Core Pillars Section -->
+    <section id="features" class="py-20 sidebar-offset max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl font-bold text-white">End-to-End Automated Compliance Engine</h2>
+            <p class="text-slate-400 mt-2 max-w-2xl mx-auto">Designed for government procurement agencies, enterprise buyers, and large contractors handling complex multi-volume RFP proposals.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="glass-card p-8 rounded-2xl border border-slate-800 hover:border-sky-500/40 group">
+                <div class="bg-sky-500/10 border border-sky-500/20 p-3.5 rounded-xl w-fit text-sky-400 mb-6 group-hover:scale-110 group-hover:bg-sky-500 group-hover:text-slate-950 transition-all duration-300">
+                    <i data-lucide="file-search" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-3">Multi-Document OCR & Clause Parsing</h3>
+                <p class="text-slate-400 text-sm leading-relaxed">
+                    Automatically extracts structural, legal, financial, and technical requirements from 500+ page RFPs, RFQs, and tender notices without manual tagging.
+                </p>
+            </div>
+
+            <div class="glass-card p-8 rounded-2xl border border-slate-800 hover:border-indigo-500/40 group">
+                <div class="bg-indigo-500/10 border border-indigo-500/20 p-3.5 rounded-xl w-fit text-indigo-400 mb-6 group-hover:scale-110 group-hover:bg-indigo-500 group-hover:text-slate-950 transition-all duration-300">
+                    <i data-lucide="git-compare" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-3">Automated Cross-Verification</h3>
+                <p class="text-slate-400 text-sm leading-relaxed">
+                    Cross-references vendor proposals against RFP requirements in real time, detecting gaps, missing annexures, and non-compliant deviations instantly.
+                </p>
+            </div>
+
+            <div class="glass-card p-8 rounded-2xl border border-slate-800 hover:border-emerald-500/40 group">
+                <div class="bg-emerald-500/10 border border-emerald-500/20 p-3.5 rounded-xl w-fit text-emerald-400 mb-6 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-slate-950 transition-all duration-300">
+                    <i data-lucide="shield-alert" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-3">Corrigendum & Exemption Auditing</h3>
+                <p class="text-slate-400 text-sm leading-relaxed">
+                    Tracks corrigenda changes across the 7 stages and automatically validates MSME/NSIC EMD exemption proofs to prevent technical rejections.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture / Tech Stack Section -->
+    <section id="architecture" class="py-20 sidebar-offset bg-slate-950/80 border-t border-slate-800/80 relative z-10 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-14">
+                <h2 class="text-3xl font-bold text-white">How BidSeva Works Under the Hood</h2>
+                <p class="text-slate-400 mt-2 max-w-2xl mx-auto">A five-stage automated pipeline that takes raw tender & vendor documents from upload to an auditable officer decision.</p>
+            </div>
+
+            <div class="pipeline-flow mb-16">
+                <div class="pipeline-step">
+                    <div class="pipeline-icon bg-sky-500/10 border-sky-500/30 text-sky-400"><i data-lucide="upload-cloud" class="w-6 h-6"></i></div>
+                    <h4 class="pipeline-title">1. Ingestion</h4>
+                    <p class="pipeline-desc">RFP & vendor bundle upload (PDF/DOCX/ZIP), plus GeM Bid Search API pull</p>
+                </div>
+                <div class="pipeline-arrow"><i data-lucide="chevron-right" class="w-5 h-5"></i></div>
+                <div class="pipeline-step">
+                    <div class="pipeline-icon bg-indigo-500/10 border-indigo-500/30 text-indigo-400"><i data-lucide="scan-text" class="w-6 h-6"></i></div>
+                    <h4 class="pipeline-title">2. OCR Extraction</h4>
+                    <p class="pipeline-desc">OCR engine pulls text, tables & signatures from scanned pages</p>
+                </div>
+                <div class="pipeline-arrow"><i data-lucide="chevron-right" class="w-5 h-5"></i></div>
+                <div class="pipeline-step">
+                    <div class="pipeline-icon bg-purple-500/10 border-purple-500/30 text-purple-400"><i data-lucide="brain-circuit" class="w-6 h-6"></i></div>
+                    <h4 class="pipeline-title">3. NLP Clause Matching</h4>
+                    <p class="pipeline-desc">Clause extraction model maps vendor fields to RFP eligibility criteria</p>
+                </div>
+                <div class="pipeline-arrow"><i data-lucide="chevron-right" class="w-5 h-5"></i></div>
+                <div class="pipeline-step">
+                    <div class="pipeline-icon bg-rose-500/10 border-rose-500/30 text-rose-400"><i data-lucide="shield-alert" class="w-6 h-6"></i></div>
+                    <h4 class="pipeline-title">4. Fraud & Risk Scoring</h4>
+                    <p class="pipeline-desc">Rules engine + anomaly model checks PAN/GSTIN duplication, UTR reuse, metadata tampering</p>
+                </div>
+                <div class="pipeline-arrow"><i data-lucide="chevron-right" class="w-5 h-5"></i></div>
+                <div class="pipeline-step">
+                    <div class="pipeline-icon bg-emerald-500/10 border-emerald-500/30 text-emerald-400"><i data-lucide="user-check" class="w-6 h-6"></i></div>
+                    <h4 class="pipeline-title">5. Officer Dashboard</h4>
+                    <p class="pipeline-desc">Ranked bidders, explainable flags & audit log surfaced for human approval</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div class="tech-chip"><i data-lucide="scan-line" class="w-4 h-4 text-sky-400"></i> OCR Engine</div>
+                <div class="tech-chip"><i data-lucide="message-square-text" class="w-4 h-4 text-indigo-400"></i> NLP / Transformers</div>
+                <div class="tech-chip"><i data-lucide="git-branch" class="w-4 h-4 text-purple-400"></i> Rules + ML Risk Model</div>
+                <div class="tech-chip"><i data-lucide="database" class="w-4 h-4 text-amber-400"></i> PostgreSQL / Vector DB</div>
+                <div class="tech-chip"><i data-lucide="plug-zap" class="w-4 h-4 text-emerald-400"></i> GeM Bid Search API</div>
+                <div class="tech-chip"><i data-lucide="lock" class="w-4 h-4 text-rose-400"></i> Hash-Chained Audit Log</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Impact / Metrics Section -->
+    <section id="impact" class="py-20 sidebar-offset max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="text-center mb-14">
+            <h2 class="text-3xl font-bold text-white">Projected Impact</h2>
+            <p class="text-slate-400 mt-2 max-w-2xl mx-auto">Estimated from typical GeM tender volumes and manual evaluation benchmarks — to be validated with real data during pilot deployment.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+            <div class="lg:col-span-2 glass-card border border-slate-800 rounded-2xl p-7">
+                <h4 class="text-sm font-bold text-white mb-6 flex items-center gap-2"><i data-lucide="timer" class="w-4 h-4 text-sky-400"></i> Verification Time per Bid</h4>
+                <div class="space-y-5">
+                    <div>
+                        <div class="flex justify-between text-xs text-slate-400 mb-1.5"><span>Manual Review (Today)</span><span class="font-bold text-amber-400">~300 min</span></div>
+                        <div class="impact-bar-track"><div class="impact-bar bg-gradient-to-r from-amber-500 to-rose-500" style="width:0%" data-target="100"></div></div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs text-slate-400 mb-1.5"><span>With BidSeva</span><span class="font-bold text-emerald-400">~3 min</span></div>
+                        <div class="impact-bar-track"><div class="impact-bar bg-gradient-to-r from-sky-500 to-emerald-500" style="width:0%" data-target="3"></div></div>
+                    </div>
+                </div>
+                <p class="text-[11px] text-slate-500 mt-6">A large reduction in officer time spent per bid on document cross-checking, freeing capacity for judgment calls that genuinely need a human.</p>
+            </div>
+
+            <div class="grid grid-cols-1 gap-5">
+                <div class="glass-card border border-slate-800 rounded-2xl p-6 text-center">
+                    <p class="text-3xl font-extrabold text-rose-400">Meaningful Share</p>
+                    <p class="text-xs text-slate-400 mt-1.5">of GeM bid rejections today trace back to document/clause mismatches, not genuine ineligibility*</p>
+                </div>
+                <div class="glass-card border border-slate-800 rounded-2xl p-6 text-center">
+                    <p class="text-3xl font-extrabold text-purple-400">Early Signal</p>
+                    <p class="text-xs text-slate-400 mt-1.5">bids flagged by the fraud engine for duplicate identity or reused financial instruments during pilot testing*</p>
+                </div>
+            </div>
+        </div>
+        <p class="text-[10px] text-slate-500 mt-6 text-center">*Illustrative figures for problem framing — to be validated against real GeM data during pilot deployment.</p>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t sidebar-offset border-slate-800/80 bg-slate-950 py-10 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
+            <p>© 2026 BidSeva. Integrated GeM Public Procurement Compliance Engine.</p>
+        </div>
+    </footer>
+
+    <!-- Application Script -->
+    <script>
+        // ===== BidSeva Theme Controller =====
+        const THEME_KEY = 'bidseva-theme';
+        function applyTheme(theme) {
+            const light = theme === 'light';
+            document.documentElement.classList.toggle('light-mode', light);
+            document.documentElement.classList.toggle('dark-mode', !light);
+            localStorage.setItem(THEME_KEY, light ? 'light' : 'dark');
+            const icon = document.getElementById('themeToggleIcon');
+            const label = document.getElementById('themeToggleLabel');
+            const btn = document.getElementById('themeToggleBtn');
+            if (icon) { icon.setAttribute('data-lucide', light ? 'moon' : 'sun'); icon.className = 'theme-icon w-3.5 h-3.5 ' + (light ? 'text-indigo-500' : 'text-amber-400'); }
+            if (label) label.textContent = light ? 'Dark Mode' : 'Light Mode';
+            if (btn) { btn.setAttribute('aria-label', light ? 'Switch to dark mode' : 'Switch to light mode'); btn.title = light ? 'Switch to dark mode' : 'Switch to light mode'; }
+            if (window.lucide) lucide.createIcons();
+        }
+        function toggleTheme() {
+            applyTheme(document.documentElement.classList.contains('light-mode') ? 'dark' : 'light');
+        }
+        (function(){
+            const saved = localStorage.getItem(THEME_KEY);
+            applyTheme(saved || 'dark');
+        })();
+
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Canvas & Dynamic Background Logic
+        const bgThemes = [
+            { name: "GeM Secure Grid", img: "https://images.unsplash.com/photo-1605732562742-3023a888e56e?auto=format&fit=crop&w=2400&q=85", nodeColor1: '#38bdf8', nodeColor2: '#f59e0b', lineRgb: '56, 189, 248' },
+            { name: "Digital India Network", img: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=2400&q=85", nodeColor1: '#34d399', nodeColor2: '#38bdf8', lineRgb: '52, 211, 153' },
+            { name: "MoPNG Cyber Vault", img: "https://images.unsplash.com/photo-1506399309177-3b43e99fead2?auto=format&fit=crop&w=2400&q=85", nodeColor1: '#818cf8', nodeColor2: '#c084fc', lineRgb: '129, 140, 248' }
+        ];
+
+        let currentBgThemeIndex = 0;
+
+        function cycleBgTheme() {
+            currentBgThemeIndex = (currentBgThemeIndex + 1) % bgThemes.length;
+            const theme = bgThemes[currentBgThemeIndex];
+            
+            document.getElementById('bgThemeLabel').innerText = theme.name;
+            const bgImg = document.getElementById('bgImg');
+            
+            bgImg.style.opacity = '0.3';
+            setTimeout(() => {
+                bgImg.src = theme.img;
+                bgImg.style.opacity = '1';
+            }, 300);
+
+            currentLineRgb = theme.lineRgb;
+            currentNodeColor1 = theme.nodeColor1;
+            currentNodeColor2 = theme.nodeColor2;
+        }
+
+        const canvas = document.getElementById('interactiveBgCanvas');
+        const ctx = canvas.getContext('2d');
+        const bgImg = document.getElementById('bgImg');
+        const cursorGlow = document.getElementById('cursorGlow');
+
+        let width, height;
+        let particles = [];
+        let mouse = { x: null, y: null, radius: 220 };
+        let currentLineRgb = '56, 189, 248';
+        let currentNodeColor1 = '#38bdf8';
+        let currentNodeColor2 = '#f59e0b';
+
+        function resizeCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            initParticles();
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.7;
+                this.vy = (Math.random() - 0.5) * 0.7;
+                this.radius = Math.random() * 2.2 + 1;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+
+                if (mouse.x !== null && mouse.y !== null) {
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < mouse.radius) {
+                        let force = (mouse.radius - dist) / mouse.radius;
+                        this.x -= (dx / dist) * force * 1.8;
+                        this.y -= (dy / dist) * force * 1.8;
+                    }
+                }
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.radius > 2 ? currentNodeColor1 : currentNodeColor2;
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = currentNodeColor1;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            const count = Math.floor((width * height) / 12000);
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animateCanvas() {
+            ctx.clearRect(0, 0, width, height);
+
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+
+                for (let j = i + 1; j < particles.length; j++) {
+                    let dx = particles[i].x - particles[j].x;
+                    let dy = particles[i].y - particles[j].y;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < 130) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.strokeStyle = `rgba(${currentLineRgb}, ${0.3 * (1 - dist / 130)})`;
+                        ctx.lineWidth = 0.7;
+                        ctx.stroke();
+                    }
+                }
+
+                if (mouse.x !== null && mouse.y !== null) {
+                    let dx = particles[i].x - mouse.x;
+                    let dy = particles[i].y - mouse.y;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < mouse.radius) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(mouse.x, mouse.y);
+                        ctx.strokeStyle = `rgba(245, 158, 11, ${0.5 * (1 - dist / mouse.radius)})`;
+                        ctx.lineWidth = 0.9;
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            requestAnimationFrame(animateCanvas);
+        }
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+
+            const moveX = (e.clientX / window.innerWidth - 0.5) * 20;
+            const moveY = (e.clientY / window.innerHeight - 0.5) * 20;
+            if (bgImg) bgImg.style.transform = `scale(1.06) translate(${moveX * -0.6}px, ${moveY * -0.6}px)`;
+            const orbit = document.querySelector('.verification-orbit');
+            if (orbit) orbit.style.transform = `translate(calc(-50% + ${moveX * 0.18}px), calc(-50% + ${moveY * 0.18}px))`;
+            if (cursorGlow) cursorGlow.style.background = `radial-gradient(650px circle at ${e.clientX}px ${e.clientY}px, rgba(${currentLineRgb}, 0.18), rgba(245, 158, 11, 0.05) 50%, transparent 80%)`;
+        });
+
+        window.addEventListener('mouseleave', () => {
+            mouse.x = null;
+            mouse.y = null;
+            if (bgImg) bgImg.style.transform = `scale(1.05) translate(0px, 0px)`;
+            const orbit = document.querySelector('.verification-orbit');
+            if (orbit) orbit.style.transform = 'translate(-50%, -50%)';
+        });
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        animateCanvas();
+
+        // File Selection & Dynamic Engine Logic
+        let currentRfpName = "GeM-Tender-2026-Railways.pdf";
+        let currentVendorName = "Vendor-Submission-Pack.zip";
+
+        function handleRfpFileSelect(input) {
+            if (input.files && input.files[0]) {
+                currentRfpName = input.files[0].name;
+                document.getElementById('rfpFileName').innerText = currentRfpName;
+                updateDynamicEngine();
+            }
+        }
+
+        function handleVendorFileSelect(input) {
+            if (input.files && input.files[0]) {
+                currentVendorName = input.files[0].name;
+                document.getElementById('vendorFileName').innerText = currentVendorName;
+                updateDynamicEngine();
+            }
+        }
+
+        function triggerCardAnimation(cardId) {
+            const card = document.getElementById(cardId);
+            if (card) {
+                card.classList.remove('value-updated');
+                void card.offsetWidth;
+                card.classList.add('value-updated');
+            }
+        }
+
+        function updateDynamicEngine() {
+            const combined = (currentRfpName + currentVendorName).toLowerCase();
+
+            let calculatedFee = 2500 + ((currentRfpName.length * 750) % 47500);
+            let formattedFee = "₹" + calculatedFee.toLocaleString('en-IN');
+
+            let calculatedEmd = 25000 + ((currentVendorName.length * 12500) % 475000);
+            let formattedEmd = "₹" + calculatedEmd.toLocaleString('en-IN');
+
+            const isMsme = combined.includes("msme") || combined.includes("udyam") || combined.includes("exempt") || combined.includes("zip");
+
+            document.getElementById('tenderFeeBadge').innerText = formattedFee + " Verified";
+            document.getElementById('tenderFeeDetail').innerText = "Fee extracted from " + currentRfpName + " (" + formattedFee + " verified in receipt).";
+            document.getElementById('matrixTenderDetail').innerText = "Parsed from " + currentVendorName + ": Payment receipt of " + formattedFee + " validated.";
+
+            triggerCardAnimation('cardTenderFee');
+
+            const emdStatusText = document.getElementById('emdStatusText');
+            const emdBadge = document.getElementById('emdBadge');
+            const emdDetail = document.getElementById('emdDetail');
+            const matrixEmdDetail = document.getElementById('matrixEmdDetail');
+            const matrixEmdResult = document.getElementById('matrixEmdResult');
+            const matrixEmdStatus = document.getElementById('matrixEmdStatus');
+
+            if (isMsme) {
+                emdStatusText.innerText = "Exempted";
+                emdStatusText.className = "text-2xl font-extrabold text-sky-400";
+                emdBadge.innerText = "Udyam Verified";
+                emdBadge.className = "text-xs text-sky-400 bg-sky-500/10 px-2.5 py-1 rounded-md border border-sky-500/30 font-semibold shadow-sm";
+                emdDetail.innerText = "Udyam Certificate detected in " + currentVendorName + "; full EMD exemption of " + formattedEmd + " applied.";
+
+                matrixEmdDetail.innerText = "MSME Proof validated in " + currentVendorName + ". Exemption active.";
+                matrixEmdResult.innerHTML = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-sky-500/10 text-sky-400 border border-sky-500/20"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Exempted</span>`;
+                matrixEmdStatus.innerText = "Cleared";
+                matrixEmdStatus.className = "text-xs font-semibold text-sky-400";
+            } else {
+                emdStatusText.innerText = "Paid";
+                emdStatusText.className = "text-2xl font-extrabold text-emerald-400";
+                emdBadge.innerText = formattedEmd + " BG Verified";
+                emdBadge.className = "text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/30 font-semibold shadow-sm";
+                emdDetail.innerText = "Bank Guarantee UTR #" + Math.floor(100000000 + Math.random() * 900000000) + " parsed for " + formattedEmd + ".";
+
+                matrixEmdDetail.innerText = "EMD Bank Guarantee of " + formattedEmd + " submitted in " + currentVendorName + ".";
+                matrixEmdResult.innerHTML = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> BG Matched</span>`;
+                matrixEmdStatus.innerText = "Cleared";
+                matrixEmdStatus.className = "text-xs font-semibold text-emerald-400";
+            }
+
+            triggerCardAnimation('cardEMD');
+            lucide.createIcons();
+        }
+
+        // ===== Document Verification Trail — dynamic interactions =====
+        function runDocumentTrailScan() {
+            const nodes = document.querySelectorAll('#docVerificationTrail .document-node');
+            const progressLine = document.getElementById('docTrailProgress');
+            if (!nodes.length) return;
+
+            nodes.forEach(node => {
+                node.classList.remove('scanning', 'verified', 'open');
+                const statusEl = node.querySelector('.document-status');
+                if (statusEl) statusEl.classList.add('pending');
+            });
+            if (progressLine) progressLine.style.right = '95%';
+
+            nodes.forEach((node, i) => {
+                const stepDelay = i * 210;
+                setTimeout(() => {
+                    node.classList.add('scanning');
+                    const statusEl = node.querySelector('.document-status');
+                    if (statusEl) statusEl.classList.remove('pending');
+                }, stepDelay);
+
+                setTimeout(() => {
+                    node.classList.remove('scanning');
+                    node.classList.add('verified');
+                    if (progressLine) {
+                        const pct = ((i + 1) / nodes.length) * 90;
+                        progressLine.style.right = (95 - pct) + '%';
+                    }
+                }, stepDelay + 430);
+            });
+        }
+
+        function initDocumentTrailInteractions() {
+            const trailEl = document.getElementById('docVerificationTrail');
+            if (!trailEl) return;
+
+            // Staggered reveal once the trail scrolls into view
+            const trailObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        trailEl.classList.add('in-view');
+                        trailObserver.unobserve(trailEl);
+                    }
+                });
+            }, { threshold: 0.2 });
+            trailObserver.observe(trailEl);
+
+            // Tap / click a document to reveal its verification note
+            trailEl.querySelectorAll('.document-node').forEach(node => {
+                node.addEventListener('click', () => {
+                    const wasOpen = node.classList.contains('open');
+                    trailEl.querySelectorAll('.document-node.open').forEach(n => n.classList.remove('open'));
+                    if (!wasOpen) node.classList.add('open');
+                });
+            });
+        }
+        document.addEventListener('DOMContentLoaded', initDocumentTrailInteractions);
+
+        // ===== Explainability toggles on flagged audit rows =====
+        function toggleExplain(btn) {
+            const row = document.getElementById(btn.dataset.target);
+            if (!row) return;
+            const nowHidden = row.classList.toggle('hidden');
+            const icon = btn.querySelector('i');
+            if (icon) {
+                icon.setAttribute('data-lucide', nowHidden ? 'chevron-down' : 'chevron-up');
+                lucide.createIcons();
+            }
+        }
+
+        // ===== Officer-in-the-loop decision panel =====
+        function setOfficerDecision(type) {
+            const buttons = {
+                approve: document.getElementById('decisionApproveBtn'),
+                review: document.getElementById('decisionReviewBtn'),
+                reject: document.getElementById('decisionRejectBtn')
+            };
+            Object.entries(buttons).forEach(([key, el]) => {
+                if (!el) return;
+                el.classList.remove('active-approve', 'active-review', 'active-reject');
+            });
+            if (buttons[type]) buttons[type].classList.add('active-' + type);
+
+            const ack = document.getElementById('officerDecisionAck');
+            if (!ack) return;
+            ack.classList.remove('hidden', 'bg-emerald-500/10', 'border-emerald-500/30', 'text-emerald-300', 'bg-amber-500/10', 'border-amber-500/30', 'text-amber-300', 'bg-rose-500/10', 'border-rose-500/30', 'text-rose-300');
+
+            const messages = {
+                approve: { text: 'Bid approved for award. Decision logged to the hash-chained audit trail with your officer ID and timestamp.', cls: ['bg-emerald-500/10', 'border-emerald-500/30', 'text-emerald-300'] },
+                review: { text: 'Bid flagged for a second-level review. It will remain pending until the review is cleared or escalated.', cls: ['bg-amber-500/10', 'border-amber-500/30', 'text-amber-300'] },
+                reject: { text: 'Bid marked as rejected. The vendor will be notified with the reasons logged in the audit matrix above.', cls: ['bg-rose-500/10', 'border-rose-500/30', 'text-rose-300'] }
+            };
+            const m = messages[type];
+            if (!m) return;
+            ack.classList.add(...m.cls);
+            ack.innerHTML = '<i data-lucide="check" class="w-3.5 h-3.5 inline mr-1.5"></i>' + m.text;
+            lucide.createIcons();
+        }
+
+        function sendVendorQuery() {
+            const box = document.getElementById('vendorQueryBox');
+            if (!box) return;
+            const text = box.value.trim();
+            if (!text) {
+                box.classList.add('border-rose-500/60');
+                box.placeholder = 'Type a query before sending…';
+                setTimeout(() => box.classList.remove('border-rose-500/60'), 1500);
+                return;
+            }
+            const ack = document.getElementById('officerDecisionAck');
+            if (ack) {
+                ack.classList.remove('hidden', 'bg-emerald-500/10', 'border-emerald-500/30', 'text-emerald-300', 'bg-amber-500/10', 'border-amber-500/30', 'text-amber-300', 'bg-rose-500/10', 'border-rose-500/30', 'text-rose-300');
+                ack.classList.add('bg-sky-500/10', 'border-sky-500/30', 'text-sky-300');
+                ack.innerHTML = '<i data-lucide="send" class="w-3.5 h-3.5 inline mr-1.5"></i>Query sent to vendor and logged to the audit trail.';
+                lucide.createIcons();
+            }
+            box.value = '';
+        }
+
+        // ===== Problem Statement stat reveal on scroll =====
+        function initStatReveal() {
+            const stats = document.querySelectorAll('#problemStatGrid .stat-reveal');
+            if (!stats.length) return;
+            const obs = new IntersectionObserver((entries) => {
+                entries.forEach((entry, i) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => entry.target.classList.add('in-view'), i * 120);
+                        obs.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.3 });
+            stats.forEach(el => obs.observe(el));
+        }
+        document.addEventListener('DOMContentLoaded', initStatReveal);
+
+        // ===== Impact bars fill on scroll =====
+        function initImpactBars() {
+            const bars = document.querySelectorAll('.impact-bar');
+            if (!bars.length) return;
+            const obs = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const bar = entry.target;
+                        requestAnimationFrame(() => {
+                            bar.style.width = (bar.dataset.target || '0') + '%';
+                        });
+                        obs.unobserve(bar);
+                    }
+                });
+            }, { threshold: 0.4 });
+            bars.forEach(el => obs.observe(el));
+        }
+        document.addEventListener('DOMContentLoaded', initImpactBars);
+
+        function runAiVerification() {
+            const btn = document.getElementById('runAiBtn');
+            const loading = document.getElementById('loadingState');
+            const results = document.getElementById('resultsDashboard');
+            const scanner = document.getElementById('scannerOverlay');
+
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+            loading.classList.remove('hidden');
+            results.classList.add('opacity-30');
+            
+            scanner.classList.remove('hidden');
+            scanner.style.animation = 'none';
+            void scanner.offsetWidth;
+            scanner.style.animation = 'float 1.5s ease-in-out infinite alternate';
+
+            runDocumentTrailScan();
+
+            setTimeout(() => {
+                updateDynamicEngine();
+                loading.classList.add('hidden');
+                scanner.classList.add('hidden');
+                results.classList.remove('opacity-30');
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }, 1500);
+        }
+
+        // ===== Audit Report Download / Save As =====
+        async function downloadAuditReport() {
+            const btn = document.getElementById('downloadAuditReportBtn');
+            const table = document.querySelector('#demo table');
+
+            if (!table) {
+                alert('Audit report data is not available.');
+                return;
+            }
+
+            const bidNumber = 'GEM/2026/B/8827461';
+            const currentDate = new Date().toLocaleString('en-IN');
+            const rfpName = typeof currentRfpName !== 'undefined' ? currentRfpName : 'Tender RFP';
+            const vendorName = typeof currentVendorName !== 'undefined' ? currentVendorName : 'Vendor Submission';
+
+            const reportHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeM Audit Report - ${bidNumber}</title>
+<style>
+    body{font-family:Arial,Helvetica,sans-serif;margin:0;background:#f4f7fb;color:#172033}
+    .page{max-width:1100px;margin:30px auto;padding:30px;background:#fff;box-shadow:0 8px 30px rgba(0,0,0,.08)}
+    .top{height:6px;background:linear-gradient(90deg,#ff9933 0 33.33%,#fff 33.33% 66.66%,#138808 66.66% 100%);border:1px solid #ddd}
+    h1{margin:22px 0 8px;font-size:26px}.meta{color:#526071;font-size:13px;line-height:1.7}
+    .summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0}
+    .card{border:1px solid #dbe2ea;border-radius:10px;padding:14px;background:#f8fafc}
+    .label{font-size:11px;text-transform:uppercase;color:#64748b;font-weight:bold}.value{font-size:14px;font-weight:bold;margin-top:5px}
+    table{width:100%;border-collapse:collapse;margin-top:20px;font-size:13px}
+    th{background:#172033;color:#fff;text-align:left;padding:11px}td{border:1px solid #dbe2ea;padding:11px;vertical-align:top}
+    .footer{margin-top:24px;padding-top:14px;border-top:1px solid #dbe2ea;color:#64748b;font-size:11px}
+    @media print{body{background:#fff}.page{box-shadow:none;margin:0;max-width:none}}
+</style>
+</head>
+<body>
+<div class="page">
+    <div class="top"></div>
+    <h1>GeM Bid Procurement Audit Report</h1>
+    <div class="meta">
+        <strong>Bid Reference:</strong> ${bidNumber}<br>
+        <strong>Generated:</strong> ${currentDate}<br>
+        <strong>RFP File:</strong> ${rfpName}<br>
+        <strong>Vendor Submission:</strong> ${vendorName}
+    </div>
+    <div class="summary">
+        <div class="card"><div class="label">Category</div><div class="value">Goods</div></div>
+        <div class="card"><div class="label">L1 Evaluation</div><div class="value">Rank 1 of 4 Bidders</div></div>
+        <div class="card"><div class="label">Verification</div><div class="value">Session Active</div></div>
+    </div>
+    <h2>Detailed Stage Audit Matrix &amp; RFP Checklist</h2>
+    ${table.outerHTML}
+    <div class="footer">Generated by BidSeva • GeM Bid Procurement &amp; Compliance Verification</div>
+</div>
+</body>
+</html>`;
+
+            const blob = new Blob([reportHtml], { type: 'text/html;charset=utf-8' });
+            const suggestedName = 'GeM_Audit_Report_GEM_2026_B_8827461.html';
+
+            try {
+                // Opens the browser/OS native "Save As" dialog where supported.
+                if ('showSaveFilePicker' in window) {
+                    const handle = await window.showSaveFilePicker({
+                        suggestedName: suggestedName,
+                        types: [{
+                            description: 'Audit Report (HTML)',
+                            accept: { 'text/html': ['.html'] }
+                        }]
+                    });
+
+                    const writable = await handle.createWritable();
+                    await writable.write(blob);
+                    await writable.close();
+
+                    btn.innerHTML = '<i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Report Saved';
+                    lucide.createIcons();
+
+                    setTimeout(() => {
+                        btn.innerHTML = '<i data-lucide="download" class="w-3.5 h-3.5"></i> Download Audit Report';
+                        lucide.createIcons();
+                    }, 2200);
+                    return;
+                }
+
+                // Fallback for browsers that do not support showSaveFilePicker.
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = suggestedName;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+                alert('Your browser does not support the Save As dialog. The report was downloaded using the browser download settings. To choose a folder each time, enable “Ask where to save each file before downloading” in your browser settings.');
+            } catch (error) {
+                // User cancelling the native Save As dialog is not an error.
+                if (error && error.name === 'AbortError') return;
+                console.error('Audit report save failed:', error);
+                alert('The audit report could not be saved. Please try again.');
+            }
+        }
+
+        // Sidebar Navigation Handling
+        const sidebarLinks = document.querySelectorAll('.sidebar-link');
+        const trackedSections = ['top', 'problem', 'stages', 'demo', 'features', 'architecture', 'impact']
+            .map(id => document.getElementById(id))
+            .filter(Boolean);
+
+        function toggleSidebar() {
+            document.body.classList.toggle('sidebar-open');
+        }
+
+        function closeSidebar() {
+            document.body.classList.remove('sidebar-open');
+        }
+
+        const sidebarObserver = new IntersectionObserver((entries) => {
+            const visible = entries
+                .filter(entry => entry.isIntersecting)
+                .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+            if (!visible) return;
+            sidebarLinks.forEach(link => {
+                link.classList.toggle('active', link.dataset.section === visible.target.id);
+            });
+        }, { rootMargin: '-20% 0px -65% 0px', threshold: [0.05, 0.2, 0.5] });
+
+        trackedSections.forEach(section => sidebarObserver.observe(section));
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') closeSidebar();
+        });
+    </script>
+</body>
+</html>
